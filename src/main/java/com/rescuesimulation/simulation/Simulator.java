@@ -55,7 +55,7 @@ public class Simulator {
         Scanner input = new Scanner(new File(filePath));
         while (input.hasNext()) {
             String[] cells = input.nextLine().split(",");
-            switch (cells[1]) {
+            switch (cells[0]) {
                 case "AMB":
                     emergencyUnits.add(new Ambulance(cells[1], world[0][0], Integer.parseInt(cells[2])));
                     break;
