@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class Simulator {
 
-    private static final String INPUT_PATH = System.getProperty("user.home") + "\\IdeaProjects\\RescueSim\\src\\assets\\inputs\\";
+    private static final String INPUT_PATH = System.getProperty("user.home") + "\\IdeaProjects\\RescueSim\\src\\main\\assets\\inputs\\";
 
     private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
     private ArrayList<Citizen> citizens = new ArrayList<>();
