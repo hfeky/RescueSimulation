@@ -4,7 +4,7 @@ import com.rescuesimulation.simulation.Address;
 
 public class Evacuator extends PoliceUnit {
 
-    public Evacuator(int maxCapacity, String id, Address location, int stepsPerCycle) {
-        super(maxCapacity, id, location, stepsPerCycle);
+    public Evacuator(String id, Address location, int stepsPerCycle, int maxCapacity) {
+        super(id, location, stepsPerCycle, maxCapacity);
     }
 }

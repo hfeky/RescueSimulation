@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class Simulator {
 
-    private static final String INPUT_PATH = System.getProperty("user.home") + "\\IdeaProjects\\RescueSim\\src\\main\\assets\\inputs\\";
+    private static final String INPUT_PATH = System.getProperty("user.home") + "\\IdeaProjects\\RescueSimulation\\src\\main\\assets\\inputs\\";
 
     private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
     private ArrayList<Citizen> citizens = new ArrayList<>();
@@ -63,7 +63,7 @@ public class Simulator {
                     emergencyUnits.add(new DiseaseControlUnit(cells[1], world[0][0], Integer.parseInt(cells[2])));
                     break;
                 case "EVC":
-                    emergencyUnits.add(new Evacuator(Integer.parseInt(cells[3]), cells[1], world[0][0], Integer.parseInt(cells[2])));
+                    emergencyUnits.add(new Evacuator(cells[1], world[0][0], Integer.parseInt(cells[2]), Integer.parseInt(cells[3])));
                     break;
                 case "FTK":
                     emergencyUnits.add(new FireTruck(cells[1], world[0][0], Integer.parseInt(cells[2])));

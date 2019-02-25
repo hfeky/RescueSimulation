@@ -11,7 +11,7 @@ public abstract class PoliceUnit extends Unit {
     private int maxCapacity;
     private int distanceToBase;
 
-    public PoliceUnit(int maxCapacity, String id, Address location, int stepsPerCycle) {
+    public PoliceUnit(String id, Address location, int stepsPerCycle, int maxCapacity) {
         super(id, location, stepsPerCycle);
         this.maxCapacity = maxCapacity;
     }
