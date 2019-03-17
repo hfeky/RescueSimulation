@@ -48,4 +48,9 @@ public abstract class Unit implements Simulatable,SOSResponder {
     public int getStepsPerCycle() {
         return stepsPerCycle;
     }
+
+    @Override
+    public void cycleStep() {
+
+    }
 }

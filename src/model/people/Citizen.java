@@ -87,4 +87,9 @@ public class Citizen implements Simulatable, Rescuable {
     public void setToxicity(int toxicity) {
         this.toxicity = toxicity;
     }
+
+    @Override
+    public void cycleStep() {
+
+    }
 }
