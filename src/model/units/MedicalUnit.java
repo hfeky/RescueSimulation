@@ -1,5 +1,6 @@
 package model.units;
 
+import model.people.Citizen;
 import simulation.Address;
 import simulation.Rescuable;
 
@@ -19,4 +20,11 @@ public abstract class MedicalUnit extends Unit {
     public abstract void receiveSOSCall(Rescuable r);
 
     public abstract void respond(Rescuable r);
+
+    public void heal() {
+        Citizen target = (Citizen) getTarget();
+        int hp = target.getHp() + healingAmount;
+        if (hp > 100) hp = 100;
+        target.setHp(hp);
+    }
 }
