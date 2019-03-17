@@ -1,10 +1,11 @@
 package model.units;
 
+import model.events.SOSResponder;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
 
-public abstract class Unit implements Simulatable {
+public abstract class Unit implements Simulatable,SOSResponder {
 
     private String unitID;
     private UnitState state;

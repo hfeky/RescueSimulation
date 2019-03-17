@@ -5,6 +5,8 @@ import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
 
+import static model.people.CitizenState.IN_TROUBLE;
+
 public class Citizen implements Simulatable, Rescuable {
 
     private Address location;
@@ -30,6 +32,12 @@ public class Citizen implements Simulatable, Rescuable {
 
     public void setState(CitizenState state) {
         this.state = state;
+    }
+
+    @Override
+    public void struckBy(Disaster d) {
+        state = IN_TROUBLE;
+
     }
 
     public Disaster getDisaster() {

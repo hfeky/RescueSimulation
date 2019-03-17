@@ -1,6 +1,7 @@
 package simulation;
 
 import model.disasters.*;
+import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.units.*;
@@ -9,7 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Simulator {
+public class Simulator implements WorldListener {
 
     private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
     private ArrayList<Citizen> citizens = new ArrayList<>();
@@ -117,5 +118,10 @@ public class Simulator {
             if (id.equals(nationalID)) return citizen;
         }
         throw new IllegalArgumentException("No citizen found with the given National ID.");
+    }
+
+    @Override
+    public void assignAddress(Simulatable sim, int x, int y) {
+
     }
 }

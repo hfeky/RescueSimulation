@@ -26,6 +26,12 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
         return location;
     }
 
+    @Override
+    public void struckBy(Disaster d) {
+
+
+    }
+
     public int getStructuralIntegrity() {
         return structuralIntegrity;
     }
