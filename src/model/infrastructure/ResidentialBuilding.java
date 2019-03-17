@@ -8,6 +8,7 @@ import simulation.Rescuable;
 import simulation.Simulatable;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ResidentialBuilding implements Simulatable, Rescuable {
 
@@ -18,12 +19,8 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
 
     private ArrayList<Citizen> occupants = new ArrayList<>();
     private Disaster disaster;
+
     private SOSListener emergencyService;
-
-    public void setEmergencyService(SOSListener emergencyService) {
-        this.emergencyService = emergencyService;
-    }
-
 
     public ResidentialBuilding(Address location) {
         this.location = location;
@@ -43,15 +40,14 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setStructuralIntegrity(int structuralIntegrity) {
-        if (structuralIntegrity == 0) {
-//            loop that sets every occupant's  Hp to 0
-            for(int i=0 ; i< occupants.size();i++){
-                occupants.get(i).setHp(0);
-
+        if (structuralIntegrity >= 0) {
+            this.structuralIntegrity = structuralIntegrity;
+            if (structuralIntegrity == 0) {
+                for (Citizen citizen : occupants) {
+                    citizen.setHp(0);
+                }
             }
-
         }
-        this.structuralIntegrity = structuralIntegrity;
     }
 
     public int getFireDamage() {
@@ -59,10 +55,9 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setFireDamage(int fireDamage) {
-        if (fireDamage == 0) {
-            structuralIntegrity = 0;
-        } else if (fireDamage > 0 && fireDamage <= 100) this.fireDamage = fireDamage;
-        this.fireDamage = fireDamage;
+        if (0 <= fireDamage && fireDamage <= 100) {
+            this.fireDamage = fireDamage;
+        }
     }
 
     public int getFoundationDamage() {
@@ -70,10 +65,10 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setFoundationDamage(int foundationDamage) {
-        if (foundationDamage > 100) {
-            structuralIntegrity = 0;
-        }
         this.foundationDamage = foundationDamage;
+        if (foundationDamage >= 100) {
+            setStructuralIntegrity(0);
+        }
     }
 
     public int getGasLevel() {
@@ -81,16 +76,14 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setGasLevel(int gasLevel) {
-        if (gasLevel == 100) {
-            for(int i=0 ; i< occupants.size();i++){
-                occupants.get(i).setHp(0);
-
-            }
-
-        } else if (gasLevel >= 0 && gasLevel < 100) {
+        if (0 <= gasLevel && gasLevel <= 100) {
             this.gasLevel = gasLevel;
+            if (gasLevel == 100) {
+                for (Citizen citizen : occupants) {
+                    citizen.setHp(0);
+                }
+            }
         }
-        this.gasLevel = gasLevel;
     }
 
     public ArrayList<Citizen> getOccupants() {
@@ -104,18 +97,19 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     @Override
     public void cycleStep() {
         if (foundationDamage > 0) {
-            structuralIntegrity = (int)(Math.random() * ((10 - 5) + 1)) + 5;
+            structuralIntegrity -= new Random().nextInt(6) + 5;
         }
-        if (fireDamage > 30 && fireDamage > 0) {
+
+        if (0 < fireDamage && fireDamage < 30) {
             structuralIntegrity -= 3;
-        }
-        if (fireDamage >= 30 && fireDamage < 70) {
+        } else if (30 <= fireDamage && fireDamage < 70) {
             structuralIntegrity -= 5;
-        }
-        if (fireDamage >= 70) {
+        } else if (70 <= fireDamage) {
             structuralIntegrity -= 7;
         }
-
     }
 
+    public void setSOSListener(SOSListener sosListener) {
+        this.emergencyService = sosListener;
+    }
 }

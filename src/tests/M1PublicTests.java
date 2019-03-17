@@ -42,6 +42,146 @@ public class M1PublicTests {
     String injuryPath = "model.disasters.Injury";
     String commandCenterPath = "controller.CommandCenter";
 
+    private static void copyFiles() throws IOException {
+        File sourceFileBuildings = new File("buildings.csv");
+        File destinationFileBuildings = new File("buildings2.csv");
+        File sourceFileCitizens = new File("citizens.csv");
+        File destinationFileCitizens = new File("citizens2.csv");
+        File sourceFileDisasters = new File("disasters.csv");
+        File destinationFileDisasters = new File("disasters2.csv");
+        File sourceFileUnits = new File("units.csv");
+        File destinationFileUnits = new File("units2.csv");
+
+
+        copyFile(sourceFileBuildings, destinationFileBuildings);
+        copyFile(sourceFileCitizens, destinationFileCitizens);
+        copyFile(sourceFileDisasters, destinationFileDisasters);
+        copyFile(sourceFileUnits, destinationFileUnits);
+
+
+    }
+
+    private static void resetFiles() throws IOException {
+        File sourceFileBuildings = new File("buildings2.csv");
+        File destinationFileBuildings = new File("buildings.csv");
+        File sourceFileCitizens = new File("citizens2.csv");
+        File destinationFileCitizens = new File("citizens.csv");
+        File sourceFileDisasters = new File("disasters2.csv");
+        File destinationFileDisasters = new File("disasters.csv");
+        File sourceFileUnits = new File("units2.csv");
+        File destinationFileUnits = new File("units.csv");
+
+        destinationFileBuildings.delete();
+        destinationFileCitizens.delete();
+        destinationFileDisasters.delete();
+        destinationFileUnits.delete();
+
+        destinationFileBuildings.createNewFile();
+        destinationFileCitizens.createNewFile();
+        destinationFileDisasters.createNewFile();
+        destinationFileUnits.createNewFile();
+
+        copyFile(sourceFileBuildings, destinationFileBuildings);
+        copyFile(sourceFileCitizens, destinationFileCitizens);
+        copyFile(sourceFileDisasters, destinationFileDisasters);
+        copyFile(sourceFileUnits, destinationFileUnits);
+
+        sourceFileBuildings.delete();
+        sourceFileCitizens.delete();
+        sourceFileDisasters.delete();
+        sourceFileUnits.delete();
+    }
+
+    @SuppressWarnings("resource")
+    private static void copyFile(File sourceFile, File destFile)
+            throws IOException {
+
+        if (!destFile.exists()) {
+            destFile.createNewFile();
+        }
+
+        FileChannel source = null;
+        FileChannel destination = null;
+        try {
+            source = new RandomAccessFile(sourceFile, "rw").getChannel();
+            destination = new RandomAccessFile(destFile, "rw").getChannel();
+
+            long position = 0;
+            long count = source.size();
+
+            source.transferTo(position, count, destination);
+        } finally {
+            if (source != null) {
+                source.close();
+            }
+            if (destination != null) {
+                destination.close();
+            }
+        }
+    }
+
+    private static boolean containsMethodName(Method[] methods, String name) {
+        for (Method method : methods) {
+            if (method.getName().equals(name))
+                return true;
+        }
+        return false;
+    }
+
+    private static void copyWithoutDeletingFiles() throws IOException {
+        File sourceFileBuildings = new File("buildings.csv");
+        File destinationFileBuildings = new File("buildings_test2.csv");
+        copyFile(sourceFileBuildings, destinationFileBuildings);
+        File sourceFileCitizens = new File("citizens.csv");
+        File destinationFileCitizens = new File("citizens_test2.csv");
+        copyFile(sourceFileCitizens, destinationFileCitizens);
+        File sourceFileDisasters = new File("disasters.csv");
+        File destinationFileDisasters = new File("disasters_test2.csv");
+        copyFile(sourceFileDisasters, destinationFileDisasters);
+
+        File sourceFileUnits = new File("units.csv");
+        File destinationFileUnits = new File("units_test2.csv");
+        copyFile(sourceFileUnits, destinationFileUnits);
+
+        sourceFileBuildings.delete();
+        sourceFileCitizens.delete();
+        sourceFileDisasters.delete();
+        sourceFileUnits.delete();
+
+    }
+
+    private static void resetWithoutDeletingFiles() throws IOException {
+
+        File sourceFileBuildings = new File("buildings_test2.csv");
+        File destinationFileBuildings = new File("buildings.csv");
+        File sourceFileCitizens = new File("citizens_test2.csv");
+        File destinationFileCitizens = new File("citizens.csv");
+        File sourceFileDisasters = new File("disasters_test2.csv");
+        File destinationFileDisasters = new File("disasters.csv");
+        File sourceFileUnits = new File("units_test2.csv");
+        File destinationFileUnits = new File("units.csv");
+
+        destinationFileBuildings.delete();
+        destinationFileCitizens.delete();
+        destinationFileDisasters.delete();
+        destinationFileUnits.delete();
+
+        destinationFileBuildings.createNewFile();
+        destinationFileCitizens.createNewFile();
+        destinationFileDisasters.createNewFile();
+        destinationFileUnits.createNewFile();
+
+        copyFile(sourceFileBuildings, destinationFileBuildings);
+        copyFile(sourceFileCitizens, destinationFileCitizens);
+        copyFile(sourceFileDisasters, destinationFileDisasters);
+        copyFile(sourceFileUnits, destinationFileUnits);
+
+        sourceFileBuildings.delete();
+        sourceFileCitizens.delete();
+        sourceFileDisasters.delete();
+        sourceFileUnits.delete();
+    }
+
     @Test(timeout = 1000)
     public void testReadingCitizenFromCSV() throws Exception {
         try {
@@ -2803,7 +2943,6 @@ public class M1PublicTests {
         testConstructorInitializationNotNull(commandCenter1, names);
     }
 
-
     @Test(timeout = 1000)
     public void testInstanceVariableSimulatorWorldInitialization()
             throws Exception {
@@ -2897,86 +3036,6 @@ public class M1PublicTests {
         }
 
     }
-
-
-    private static void copyFiles() throws IOException {
-        File sourceFileBuildings = new File("buildings.csv");
-        File destinationFileBuildings = new File("buildings2.csv");
-        File sourceFileCitizens = new File("citizens.csv");
-        File destinationFileCitizens = new File("citizens2.csv");
-        File sourceFileDisasters = new File("disasters.csv");
-        File destinationFileDisasters = new File("disasters2.csv");
-        File sourceFileUnits = new File("units.csv");
-        File destinationFileUnits = new File("units2.csv");
-
-
-        copyFile(sourceFileBuildings, destinationFileBuildings);
-        copyFile(sourceFileCitizens, destinationFileCitizens);
-        copyFile(sourceFileDisasters, destinationFileDisasters);
-        copyFile(sourceFileUnits, destinationFileUnits);
-
-
-    }
-
-    private static void resetFiles() throws IOException {
-        File sourceFileBuildings = new File("buildings2.csv");
-        File destinationFileBuildings = new File("buildings.csv");
-        File sourceFileCitizens = new File("citizens2.csv");
-        File destinationFileCitizens = new File("citizens.csv");
-        File sourceFileDisasters = new File("disasters2.csv");
-        File destinationFileDisasters = new File("disasters.csv");
-        File sourceFileUnits = new File("units2.csv");
-        File destinationFileUnits = new File("units.csv");
-
-        destinationFileBuildings.delete();
-        destinationFileCitizens.delete();
-        destinationFileDisasters.delete();
-        destinationFileUnits.delete();
-
-        destinationFileBuildings.createNewFile();
-        destinationFileCitizens.createNewFile();
-        destinationFileDisasters.createNewFile();
-        destinationFileUnits.createNewFile();
-
-        copyFile(sourceFileBuildings, destinationFileBuildings);
-        copyFile(sourceFileCitizens, destinationFileCitizens);
-        copyFile(sourceFileDisasters, destinationFileDisasters);
-        copyFile(sourceFileUnits, destinationFileUnits);
-
-        sourceFileBuildings.delete();
-        sourceFileCitizens.delete();
-        sourceFileDisasters.delete();
-        sourceFileUnits.delete();
-    }
-
-    @SuppressWarnings("resource")
-    private static void copyFile(File sourceFile, File destFile)
-            throws IOException {
-
-        if (!destFile.exists()) {
-            destFile.createNewFile();
-        }
-
-        FileChannel source = null;
-        FileChannel destination = null;
-        try {
-            source = new RandomAccessFile(sourceFile, "rw").getChannel();
-            destination = new RandomAccessFile(destFile, "rw").getChannel();
-
-            long position = 0;
-            long count = source.size();
-
-            source.transferTo(position, count, destination);
-        } finally {
-            if (source != null) {
-                source.close();
-            }
-            if (destination != null) {
-                destination.close();
-            }
-        }
-    }
-
 
     @Test(timeout = 1000)
     public void testReadingBuildingsFromCSV() throws Exception {
@@ -3326,7 +3385,6 @@ public class M1PublicTests {
 
     }
 
-
     public void testEnumValues(Class aClass, String[] value) throws ClassNotFoundException {
         for (int i = 0; i < value.length; i++) {
             try {
@@ -3396,14 +3454,6 @@ public class M1PublicTests {
         }
         assertTrue(aClass.getSimpleName() + " class should have " + methodName + " method that takes one " + inputType.getSimpleName() + " parameter.", found);
         assertTrue("Incorrect return type for " + methodName + " method in " + aClass.getSimpleName() + ".", m.getReturnType().equals(Void.TYPE));
-    }
-
-    private static boolean containsMethodName(Method[] methods, String name) {
-        for (Method method : methods) {
-            if (method.getName().equals(name))
-                return true;
-        }
-        return false;
     }
 
     private void testConstructorExists(Class aClass, Class[] inputs) {
@@ -3734,60 +3784,6 @@ public class M1PublicTests {
         }
 
 
-    }
-
-    private static void copyWithoutDeletingFiles() throws IOException {
-        File sourceFileBuildings = new File("buildings.csv");
-        File destinationFileBuildings = new File("buildings_test2.csv");
-        copyFile(sourceFileBuildings, destinationFileBuildings);
-        File sourceFileCitizens = new File("citizens.csv");
-        File destinationFileCitizens = new File("citizens_test2.csv");
-        copyFile(sourceFileCitizens, destinationFileCitizens);
-        File sourceFileDisasters = new File("disasters.csv");
-        File destinationFileDisasters = new File("disasters_test2.csv");
-        copyFile(sourceFileDisasters, destinationFileDisasters);
-
-        File sourceFileUnits = new File("units.csv");
-        File destinationFileUnits = new File("units_test2.csv");
-        copyFile(sourceFileUnits, destinationFileUnits);
-
-        sourceFileBuildings.delete();
-        sourceFileCitizens.delete();
-        sourceFileDisasters.delete();
-        sourceFileUnits.delete();
-
-    }
-
-    private static void resetWithoutDeletingFiles() throws IOException {
-
-        File sourceFileBuildings = new File("buildings_test2.csv");
-        File destinationFileBuildings = new File("buildings.csv");
-        File sourceFileCitizens = new File("citizens_test2.csv");
-        File destinationFileCitizens = new File("citizens.csv");
-        File sourceFileDisasters = new File("disasters_test2.csv");
-        File destinationFileDisasters = new File("disasters.csv");
-        File sourceFileUnits = new File("units_test2.csv");
-        File destinationFileUnits = new File("units.csv");
-
-        destinationFileBuildings.delete();
-        destinationFileCitizens.delete();
-        destinationFileDisasters.delete();
-        destinationFileUnits.delete();
-
-        destinationFileBuildings.createNewFile();
-        destinationFileCitizens.createNewFile();
-        destinationFileDisasters.createNewFile();
-        destinationFileUnits.createNewFile();
-
-        copyFile(sourceFileBuildings, destinationFileBuildings);
-        copyFile(sourceFileCitizens, destinationFileCitizens);
-        copyFile(sourceFileDisasters, destinationFileDisasters);
-        copyFile(sourceFileUnits, destinationFileUnits);
-
-        sourceFileBuildings.delete();
-        sourceFileCitizens.delete();
-        sourceFileDisasters.delete();
-        sourceFileUnits.delete();
     }
 
 }

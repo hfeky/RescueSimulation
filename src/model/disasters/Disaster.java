@@ -1,7 +1,5 @@
 package model.disasters;
 
-import model.infrastructure.ResidentialBuilding;
-import model.people.Citizen;
 import simulation.Rescuable;
 import simulation.Simulatable;
 
@@ -33,13 +31,7 @@ public abstract class Disaster implements Simulatable {
     }
 
     @Override
-    public void cycleStep() {
+    public abstract void cycleStep();
 
-    }
-    public void strike(){
-
-
-
-
-    }
+    public abstract void strike();
 }

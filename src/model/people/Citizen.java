@@ -18,26 +18,16 @@ public class Citizen implements Simulatable, Rescuable {
     private int hp = 100;
     private int bloodLoss, toxicity;
     private Disaster disaster;
+
     private SOSListener emergencyService;
     private WorldListener worldListener;
 
-    public Citizen(Address location, String nationalID, String name, int age) {
+    public Citizen(Address location, String nationalID, String name, int age, WorldListener worldListener) {
         this.location = location;
         this.nationalID = nationalID;
         this.name = name;
         this.age = age;
-    }
-
-    public WorldListener getWorldListener() {
-        return worldListener;
-    }
-
-    public void setWorldListener(WorldListener worldListener) {
-        this.worldListener = worldListener;
-    }
-
-    public void setEmergencyService(SOSListener emergencyService) {
-        this.emergencyService = emergencyService;
+        setWorldListener(worldListener);
     }
 
     public CitizenState getState() {
@@ -46,12 +36,6 @@ public class Citizen implements Simulatable, Rescuable {
 
     public void setState(CitizenState state) {
         this.state = state;
-    }
-
-    @Override
-    public void struckBy(Disaster d) {
-        state = IN_TROUBLE;
-
     }
 
     public Disaster getDisaster() {
@@ -83,8 +67,10 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setHp(int hp) {
-        if (hp == 0) state = CitizenState.DECEASED;
-        else if (hp > 0 && hp <= 100) this.hp = hp;
+        if (0 <= hp && hp <= 100) {
+            this.hp = hp;
+            if (hp == 0) state = CitizenState.DECEASED;
+        }
     }
 
     public int getBloodLoss() {
@@ -92,8 +78,10 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setBloodLoss(int bloodLoss) {
-        if (bloodLoss == 100) setHp(0);
-        else if (bloodLoss >= 0 && bloodLoss < 100) this.bloodLoss = bloodLoss;
+        if (0 <= bloodLoss && bloodLoss <= 100) {
+            this.bloodLoss = bloodLoss;
+            if (bloodLoss == 100) setHp(0);
+        }
     }
 
     public int getToxicity() {
@@ -101,18 +89,45 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setToxicity(int toxicity) {
-        if (toxicity == 100) setHp(0);
-        else if (toxicity >= 0 && toxicity < 100) this.toxicity = toxicity;
+        if (0 <= toxicity && toxicity <= 100) {
+            this.toxicity = toxicity;
+            if (toxicity == 100) setHp(0);
+        }
     }
 
     @Override
     public void cycleStep() {
-        if (bloodLoss > 0 && bloodLoss < 30) hp -= 5;
-        else if (bloodLoss >= 30 && bloodLoss < 70) hp -= 10;
-        else if (bloodLoss >= 70) hp -= 15;
+        if (0 < bloodLoss && bloodLoss < 30) {
+            hp -= 5;
+        } else if (30 <= bloodLoss && bloodLoss < 70) {
+            hp -= 10;
+        } else if (70 <= bloodLoss) {
+            hp -= 15;
+        }
 
-        if (toxicity > 0 && toxicity < 30) hp -= 5;
-        else if (toxicity >= 30 && toxicity < 70) hp -= 10;
-        else if (toxicity >= 70) hp -= 15;
+        if (0 < toxicity && toxicity < 30) {
+            hp -= 5;
+        } else if (30 <= toxicity && toxicity < 70) {
+            hp -= 10;
+        } else if (70 <= toxicity) {
+            hp -= 15;
+        }
+    }
+
+    @Override
+    public void struckBy(Disaster d) {
+        state = IN_TROUBLE;
+    }
+
+    public void setSOSListener(SOSListener sosListener) {
+        this.emergencyService = sosListener;
+    }
+
+    public WorldListener getWorldListener() {
+        return worldListener;
+    }
+
+    public void setWorldListener(WorldListener worldListener) {
+        this.worldListener = worldListener;
     }
 }

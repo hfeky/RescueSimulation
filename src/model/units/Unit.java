@@ -17,25 +17,15 @@ public abstract class Unit implements Simulatable, SOSResponder {
     private Rescuable target;
     private int distanceToTarget;
     private int stepsPerCycle;
+
     private WorldListener worldListener;
 
-    public Unit(String unitID, Address location, int stepsPerCycle) {
+    public Unit(String unitID, Address location, int stepsPerCycle, WorldListener worldListener) {
         this.unitID = unitID;
         this.location = location;
         this.stepsPerCycle = stepsPerCycle;
         state = UnitState.IDLE;
-    }
-
-    public void setDistanceToTarget(int distanceToTarget) {
-        this.distanceToTarget = distanceToTarget;
-    }
-
-    public WorldListener getWorldListener() {
-        return worldListener;
-    }
-
-    public void setWorldListener(WorldListener worldListener) {
-        this.worldListener = worldListener;
+        setWorldListener(worldListener);
     }
 
     public String getUnitID() {
@@ -66,7 +56,18 @@ public abstract class Unit implements Simulatable, SOSResponder {
         return stepsPerCycle;
     }
 
-    @Override
+    public void setDistanceToTarget(int distanceToTarget) {
+        this.distanceToTarget = distanceToTarget;
+    }
+
+    public WorldListener getWorldListener() {
+        return worldListener;
+    }
+
+    public void setWorldListener(WorldListener worldListener) {
+        this.worldListener = worldListener;
+    }
+
     public void cycleStep() {
         if (state == UnitState.RESPONDING) {
             if (distanceToTarget <= stepsPerCycle) {
@@ -80,71 +81,38 @@ public abstract class Unit implements Simulatable, SOSResponder {
         }
     }
 
-    public void treat() {
+    private void treat() {
         target.getDisaster().setActive(false);
         if (target instanceof ResidentialBuilding) {
-            int fireDamage = ((ResidentialBuilding) target).getFireDamage();
-            int foundationDamage = ((ResidentialBuilding) target).getFoundationDamage();
-            int gasLevel = ((ResidentialBuilding) target).getGasLevel();
+            ResidentialBuilding building = (ResidentialBuilding) target;
             int treatmentAmount = 10;
-
-            if (fireDamage < treatmentAmount) {
-                treatmentAmount -= fireDamage;
-                fireDamage = 0;
-            } else {
-                fireDamage -= treatmentAmount;
-                treatmentAmount = 0;
-            }
-            if (foundationDamage < treatmentAmount) {
-                treatmentAmount -= foundationDamage;
-                foundationDamage = 0;
-            } else {
-                foundationDamage -= treatmentAmount;
-                treatmentAmount = 0;
-            }
-            if (gasLevel < treatmentAmount) {
-                treatmentAmount -= gasLevel;
-                gasLevel = 0;
-            } else {
-                gasLevel -= treatmentAmount;
-                treatmentAmount = 0;
-            }
-
-            ((ResidentialBuilding) target).setFireDamage(fireDamage);
-            ((ResidentialBuilding) target).setFoundationDamage(foundationDamage);
-            ((ResidentialBuilding) target).setGasLevel(gasLevel);
+            building.setFireDamage(Math.max(building.getFireDamage() - treatmentAmount, 0));
+            building.setFoundationDamage(Math.max(building.getFoundationDamage() - treatmentAmount, 0));
+            building.setGasLevel(Math.max(building.getGasLevel() - treatmentAmount, 0));
         } else if (target instanceof Citizen) {
-            int bloodLoss = ((Citizen) target).getBloodLoss();
-            int toxicity = ((Citizen) target).getToxicity();
+            Citizen citizen = (Citizen) target;
             int treatmentAmount = ((MedicalUnit) this).getTreatmentAmount();
-
-            if (bloodLoss < treatmentAmount) {
-                treatmentAmount -= bloodLoss;
-                bloodLoss = 0;
-            } else {
-                bloodLoss -= treatmentAmount;
-                treatmentAmount = 0;
-            }
-            if (toxicity < treatmentAmount) {
-                treatmentAmount -= toxicity;
-                toxicity = 0;
-            } else {
-                toxicity -= treatmentAmount;
-                treatmentAmount = 0;
-            }
-
-            ((Citizen) target).setState(CitizenState.RESCUED);
-            ((Citizen) target).setBloodLoss(bloodLoss);
-            ((Citizen) target).setToxicity(toxicity);
-
-            if (bloodLoss == 0 && toxicity == 0)
+            citizen.setBloodLoss(Math.max(citizen.getBloodLoss() - treatmentAmount, 0));
+            citizen.setToxicity(Math.max(citizen.getToxicity() - treatmentAmount, 0));
+            citizen.setState(CitizenState.RESCUED);
+            if (citizen.getBloodLoss() == 0 && citizen.getToxicity() == 0) {
                 ((MedicalUnit) this).heal();
+            }
         }
     }
-    public void jobsDone() {
-        if (target instanceof Citizen && ( ((Citizen) target).getState() == CitizenState.RESCUED || ((Citizen) target).getState() == CitizenState.DECEASED) )
-            state = UnitState.IDLE;
-        else if (target instanceof ResidentialBuilding && ( ( ((ResidentialBuilding) target).getFireDamage() == 0 && ((ResidentialBuilding) target).getFoundationDamage() == 0 && ((ResidentialBuilding) target).getGasLevel() == 0) || ((ResidentialBuilding) target).getStructuralIntegrity() == 0) )
-            state = UnitState.IDLE;
+
+    private void jobsDone() {
+        if (target instanceof Citizen) {
+            Citizen citizen = (Citizen) target;
+            if (citizen.getState() == CitizenState.RESCUED || citizen.getState() == CitizenState.DECEASED) {
+                state = UnitState.IDLE;
+            }
+        } else if (target instanceof ResidentialBuilding) {
+            ResidentialBuilding building = (ResidentialBuilding) target;
+            if ((building.getFireDamage() == 0 && building.getFoundationDamage() == 0 && building.getGasLevel() == 0) ||
+                    building.getStructuralIntegrity() == 0) {
+                state = UnitState.IDLE;
+            }
+        }
     }
 }

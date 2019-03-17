@@ -3,9 +3,9 @@ package simulation;
 import model.disasters.Disaster;
 
 public interface Rescuable {
+    void struckBy(Disaster d);
 
-     void struckBy(Disaster d);
-     Address getLocation();
+    Address getLocation();
+
     Disaster getDisaster();
-
 }
