@@ -12,6 +12,10 @@ public abstract class MedicalUnit extends Unit {
         super(id, location, stepsPerCycle);
     }
 
+    public int getTreatmentAmount() {
+        return treatmentAmount;
+    }
+
     public abstract void receiveSOSCall(Rescuable r);
 
     public abstract void respond(Rescuable r);
