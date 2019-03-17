@@ -10,10 +10,13 @@ public abstract class PoliceUnit extends Unit {
     private ArrayList<Citizen> passengers = new ArrayList<>();
     private int maxCapacity;
     private int distanceToBase;
-
     public PoliceUnit(String id, Address location, int stepsPerCycle, int maxCapacity) {
         super(id, location, stepsPerCycle);
         this.maxCapacity = maxCapacity;
+    }
+
+    public ArrayList<Citizen> getPassengers() {
+        return passengers;
     }
 
     public int getMaxCapacity() {
