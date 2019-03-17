@@ -94,10 +94,10 @@ public abstract class Unit implements Simulatable, SOSResponder {
             int treatmentAmount = ((MedicalUnit) this).getTreatmentAmount();
             citizen.setBloodLoss(Math.max(citizen.getBloodLoss() - treatmentAmount, 0));
             citizen.setToxicity(Math.max(citizen.getToxicity() - treatmentAmount, 0));
-            citizen.setState(CitizenState.RESCUED);
             if (citizen.getBloodLoss() == 0 && citizen.getToxicity() == 0) {
                 ((MedicalUnit) this).heal();
             }
+            citizen.setState(CitizenState.RESCUED);
         }
     }
 
