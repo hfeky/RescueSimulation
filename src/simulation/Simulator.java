@@ -122,6 +122,6 @@ public class Simulator implements WorldListener {
 
     @Override
     public void assignAddress(Simulatable sim, int x, int y) {
-
+        //sim.setLocation(new Address(x,y));
     }
 }
