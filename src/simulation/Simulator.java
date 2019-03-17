@@ -167,6 +167,9 @@ public class Simulator implements WorldListener {
             unit.cycleStep();
         }
         // Check executed disasters
+        for (Disaster disaster : executedDisasters) {
+            disaster.cycleStep();
+        }
         for (ResidentialBuilding building : buildings) {
             building.cycleStep();
         }
