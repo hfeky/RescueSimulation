@@ -29,4 +29,9 @@ public abstract class Disaster implements Simulatable {
     public Rescuable getTarget() {
         return target;
     }
+
+    @Override
+    public void cycleStep() {
+
+    }
 }

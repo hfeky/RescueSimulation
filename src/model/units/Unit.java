@@ -47,4 +47,9 @@ public abstract class Unit implements Simulatable {
     public int getStepsPerCycle() {
         return stepsPerCycle;
     }
+
+    @Override
+    public void cycleStep() {
+
+    }
 }

@@ -65,4 +65,9 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     public Disaster getDisaster() {
         return disaster;
     }
+
+    @Override
+    public void cycleStep() {
+
+    }
 }
