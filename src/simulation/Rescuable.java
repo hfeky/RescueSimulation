@@ -8,6 +8,4 @@ public interface Rescuable {
      Address getLocation();
     Disaster getDisaster();
 
-
-
 }
