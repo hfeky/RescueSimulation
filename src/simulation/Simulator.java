@@ -1,6 +1,7 @@
 package simulation;
 
 import model.disasters.*;
+import model.events.SOSListener;
 import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
@@ -14,13 +15,16 @@ public class Simulator implements WorldListener {
 
     private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
     private ArrayList<Citizen> citizens = new ArrayList<>();
+
     private ArrayList<Unit> emergencyUnits = new ArrayList<>();
     private ArrayList<Disaster> plannedDisasters = new ArrayList<>();
     private ArrayList<Disaster> executedDisasters = new ArrayList<>();
 
     private Address[][] world = new Address[10][10];
     private int currentCycle;
+    private SOSListener emergencyService;
 
+    //change constructor to: Simulator (SOSListener emergencyService)
     public Simulator() throws Exception {
         for (int i = 0; i < world.length; i++) {
             for (int j = 0; j < world[0].length; j++) {
@@ -123,5 +127,20 @@ public class Simulator implements WorldListener {
     @Override
     public void assignAddress(Simulatable sim, int x, int y) {
         //sim.setLocation(new Address(x,y));
+    }
+
+    public ArrayList<Unit> getEmergencyUnits() {
+        return emergencyUnits;
+    }
+
+    public void setEmergencyService(SOSListener emergencyService) {
+        this.emergencyService = emergencyService;
+    }
+
+    public boolean checkGameOver(){
+
+
+
+        return false;
     }
 }
