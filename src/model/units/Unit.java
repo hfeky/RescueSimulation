@@ -124,6 +124,8 @@ public abstract class Unit implements Simulatable, SOSResponder {
                 if (!(citizen.getHp() < 100 && citizen.getBloodLoss() == 0 && citizen.getToxicity() == 0)) {
                     r.getDisaster().setActive(true);
                 }
+            } else {
+                r.getDisaster().setActive(true);
             }
         } else {
             setState(UnitState.RESPONDING);
