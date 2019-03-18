@@ -32,7 +32,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
 
     @Override
     public void struckBy(Disaster d) {
-
+        emergencyService.receiveSOSCall(this);
     }
 
     public int getStructuralIntegrity() {

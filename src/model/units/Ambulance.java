@@ -9,9 +9,4 @@ public class Ambulance extends MedicalUnit {
     public Ambulance(String id, Address location, int stepsPerCycle, WorldListener worldListener) {
         super(id, location, stepsPerCycle, worldListener);
     }
-
-    @Override
-    public void respond(Rescuable r) {
-
-    }
 }

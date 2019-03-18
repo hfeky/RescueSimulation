@@ -115,4 +115,30 @@ public abstract class Unit implements Simulatable, SOSResponder {
             }
         }
     }
+
+    @Override
+    public void respond(Rescuable r) {
+        if (getState() == UnitState.RESPONDING) {
+            if (r instanceof Citizen) {
+                Citizen citizen = (Citizen) r;
+                if (!(citizen.getHp() < 100 && citizen.getBloodLoss() == 0 && citizen.getToxicity() == 0)) {
+                    r.getDisaster().setActive(true);
+                }
+            }
+        } else {
+            setState(UnitState.RESPONDING);
+        }
+        target = r;
+        if (r instanceof Citizen) {
+            Citizen citizen = (Citizen) r;
+            if (!(citizen.getHp() < 100 && citizen.getBloodLoss() == 0 && citizen.getToxicity() == 0)) {
+                r.getDisaster().setActive(true);
+            }
+            setDistanceToTarget((citizen.getLocation().getX() - getLocation().getX()) + (citizen.getLocation().getY() - getLocation().getY()));
+        } else if (r instanceof ResidentialBuilding) {
+            ResidentialBuilding building = (ResidentialBuilding) r;
+            setDistanceToTarget((building.getLocation().getX() - getLocation().getX()) + (building.getLocation().getY() - getLocation().getY()));
+        }
+        treat();
+    }
 }
