@@ -146,7 +146,8 @@ public class Simulator implements WorldListener {
 
     private boolean checkGameOver() {
         if (plannedDisasters.size() > 0) return false;
-        if (executedDisasters.size() > 0) return false; // Update that
+        // Update that
+        if (executedDisasters.size() > 0) return false;
         for (Unit unit : emergencyUnits) {
             if (unit.getState() != UnitState.IDLE) return false;
         }
