@@ -18,6 +18,7 @@ public class Collapse extends Disaster {
 
     @Override
     public void strike() {
+        super.strike();
         residentialBuilding.setFoundationDamage(residentialBuilding.getFoundationDamage() + 10);
     }
 }

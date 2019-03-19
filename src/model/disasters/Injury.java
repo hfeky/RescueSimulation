@@ -18,6 +18,7 @@ public class Injury extends Disaster {
 
     @Override
     public void strike() {
+        super.strike();
         citizen.setBloodLoss(citizen.getBloodLoss() + 30);
     }
 }

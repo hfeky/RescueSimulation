@@ -30,8 +30,7 @@ public abstract class Disaster implements Simulatable {
         return target;
     }
 
-    @Override
-    public abstract void cycleStep();
-
-    public abstract void strike();
+    public void strike() {
+        setActive(true);
+    }
 }

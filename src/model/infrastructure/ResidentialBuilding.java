@@ -28,6 +28,10 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
         this.location = location;
     }
 
+    public Disaster getDisaster() {
+        return disaster;
+    }
+
     public Address getLocation() {
         return location;
     }
@@ -93,23 +97,19 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
         return occupants;
     }
 
-    public Disaster getDisaster() {
-        return disaster;
-    }
-
     @Override
     public void cycleStep() {
         if (disaster instanceof Collapse) {
             if (foundationDamage > 0) {
-                structuralIntegrity -= new Random().nextInt(6) + 5;
+                setStructuralIntegrity(Math.max(structuralIntegrity - new Random().nextInt(6) + 5, 0));
             }
         } else if (disaster instanceof Fire) {
             if (0 < fireDamage && fireDamage < 30) {
-                structuralIntegrity -= 3;
+                setStructuralIntegrity(Math.max(structuralIntegrity - 3, 0));
             } else if (30 <= fireDamage && fireDamage < 70) {
-                structuralIntegrity -= 5;
+                setStructuralIntegrity(Math.max(structuralIntegrity - 5, 0));
             } else if (70 <= fireDamage) {
-                structuralIntegrity -= 7;
+                setStructuralIntegrity(Math.max(structuralIntegrity - 7, 0));
             }
         }
     }

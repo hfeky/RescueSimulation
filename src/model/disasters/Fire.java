@@ -18,6 +18,7 @@ public class Fire extends Disaster {
 
     @Override
     public void strike() {
+        super.strike();
         residentialBuilding.setFireDamage(residentialBuilding.getFireDamage() + 10);
     }
 }

@@ -101,27 +101,27 @@ public class Citizen implements Simulatable, Rescuable {
     public void cycleStep() {
         if (disaster instanceof Injury) {
             if (0 < bloodLoss && bloodLoss < 30) {
-                hp -= 5;
+                setHp(Math.max(hp - 5, 0));
             } else if (30 <= bloodLoss && bloodLoss < 70) {
-                hp -= 10;
+                setHp(Math.max(hp - 10, 0));
             } else if (70 <= bloodLoss) {
-                hp -= 15;
+                setHp(Math.max(hp - 15, 0));
             }
         } else if (disaster instanceof Infection) {
             if (0 < toxicity && toxicity < 30) {
-                hp -= 5;
+                setHp(Math.max(hp - 5, 0));
             } else if (30 <= toxicity && toxicity < 70) {
-                hp -= 10;
+                setHp(Math.max(hp - 10, 0));
             } else if (70 <= toxicity) {
-                hp -= 15;
+                setHp(Math.max(hp - 15, 0));
             }
         }
     }
 
     @Override
     public void struckBy(Disaster d) {
-        disaster = d;
         state = IN_TROUBLE;
+        disaster = d;
         emergencyService.receiveSOSCall(this);
     }
 

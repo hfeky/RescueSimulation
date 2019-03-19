@@ -18,6 +18,7 @@ public class Infection extends Disaster {
 
     @Override
     public void strike() {
+        super.strike();
         citizen.setToxicity(citizen.getToxicity() + 25);
     }
 }

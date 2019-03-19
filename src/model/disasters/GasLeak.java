@@ -18,6 +18,7 @@ public class GasLeak extends Disaster {
 
     @Override
     public void strike() {
+        super.strike();
         residentialBuilding.setGasLevel(residentialBuilding.getGasLevel() + 10);
     }
 }
