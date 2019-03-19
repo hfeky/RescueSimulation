@@ -70,19 +70,37 @@ public abstract class Unit implements Simulatable, SOSResponder {
 
     public void cycleStep() {
         if (state == UnitState.RESPONDING) {
-            if (distanceToTarget <= stepsPerCycle) {
-                distanceToTarget = 0;
-                state = UnitState.TREATING;
-                location = target.getLocation();
-            } else //if (distanceToTarget > 0)
-                distanceToTarget -= stepsPerCycle;
-        } else if (state == UnitState.TREATING) {
-            treat();
+            if (target instanceof ResidentialBuilding && this instanceof Evacuator) {
+                Evacuator evacuator = (Evacuator) this;
+                if (evacuator.getPassengers().size() == evacuator.getMaxCapacity()) {
+                    evacuator.setDistanceToBase(Math.max(evacuator.getDistanceToBase() - evacuator.getStepsPerCycle(), 0));
+                    evacuator.setDistanceToTarget(Math.max(target.getLocation().getX() + target.getLocation().getY() + evacuator.getStepsPerCycle(), 0));
+                } else {
+                    evacuator.setDistanceToBase(Math.max(evacuator.getDistanceToBase() - evacuator.getStepsPerCycle(), 0));
+                    evacuator.setDistanceToTarget(Math.max(target.getLocation().getX() + target.getLocation().getY() + evacuator.getStepsPerCycle(), 0));
+                }
+            } else {
+                distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
+            }
+        }
+        if (getLocation().getX() == target.getLocation().getX() &&
+                getLocation().getY() == target.getLocation().getY()) {
+            if (target instanceof ResidentialBuilding && this instanceof Evacuator) {
+                ResidentialBuilding building = (ResidentialBuilding) target;
+                Evacuator evacuator = (Evacuator) this;
+                int capacityToFill = evacuator.getMaxCapacity() - evacuator.getPassengers().size();
+                for (int i = 0; i < Math.min(building.getOccupants().size(), capacityToFill); i++) {
+                    evacuator.getPassengers().add(building.getOccupants().remove(building.getOccupants().size() - 1));
+                }
+            } else {
+                treat();
+            }
         }
     }
 
     private void treat() {
         target.getDisaster().setActive(false);
+        setState(UnitState.TREATING);
         if (target instanceof ResidentialBuilding) {
             ResidentialBuilding building = (ResidentialBuilding) target;
             int treatmentAmount = 10;

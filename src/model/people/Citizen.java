@@ -1,6 +1,8 @@
 package model.people;
 
 import model.disasters.Disaster;
+import model.disasters.Infection;
+import model.disasters.Injury;
 import model.events.SOSListener;
 import model.events.WorldListener;
 import simulation.Address;
@@ -97,25 +99,28 @@ public class Citizen implements Simulatable, Rescuable {
 
     @Override
     public void cycleStep() {
-        if (0 < bloodLoss && bloodLoss < 30) {
-            hp -= 5;
-        } else if (30 <= bloodLoss && bloodLoss < 70) {
-            hp -= 10;
-        } else if (70 <= bloodLoss) {
-            hp -= 15;
-        }
-
-        if (0 < toxicity && toxicity < 30) {
-            hp -= 5;
-        } else if (30 <= toxicity && toxicity < 70) {
-            hp -= 10;
-        } else if (70 <= toxicity) {
-            hp -= 15;
+        if (disaster instanceof Injury) {
+            if (0 < bloodLoss && bloodLoss < 30) {
+                hp -= 5;
+            } else if (30 <= bloodLoss && bloodLoss < 70) {
+                hp -= 10;
+            } else if (70 <= bloodLoss) {
+                hp -= 15;
+            }
+        } else if (disaster instanceof Infection) {
+            if (0 < toxicity && toxicity < 30) {
+                hp -= 5;
+            } else if (30 <= toxicity && toxicity < 70) {
+                hp -= 10;
+            } else if (70 <= toxicity) {
+                hp -= 15;
+            }
         }
     }
 
     @Override
     public void struckBy(Disaster d) {
+        disaster = d;
         state = IN_TROUBLE;
         emergencyService.receiveSOSCall(this);
     }

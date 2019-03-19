@@ -1,6 +1,8 @@
 package model.infrastructure;
 
+import model.disasters.Collapse;
 import model.disasters.Disaster;
+import model.disasters.Fire;
 import model.events.SOSListener;
 import model.people.Citizen;
 import simulation.Address;
@@ -32,6 +34,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
 
     @Override
     public void struckBy(Disaster d) {
+        disaster = d;
         emergencyService.receiveSOSCall(this);
     }
 
@@ -96,16 +99,18 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
 
     @Override
     public void cycleStep() {
-        if (foundationDamage > 0) {
-            structuralIntegrity -= new Random().nextInt(6) + 5;
-        }
-
-        if (0 < fireDamage && fireDamage < 30) {
-            structuralIntegrity -= 3;
-        } else if (30 <= fireDamage && fireDamage < 70) {
-            structuralIntegrity -= 5;
-        } else if (70 <= fireDamage) {
-            structuralIntegrity -= 7;
+        if (disaster instanceof Collapse) {
+            if (foundationDamage > 0) {
+                structuralIntegrity -= new Random().nextInt(6) + 5;
+            }
+        } else if (disaster instanceof Fire) {
+            if (0 < fireDamage && fireDamage < 30) {
+                structuralIntegrity -= 3;
+            } else if (30 <= fireDamage && fireDamage < 70) {
+                structuralIntegrity -= 5;
+            } else if (70 <= fireDamage) {
+                structuralIntegrity -= 7;
+            }
         }
     }
 

@@ -17,7 +17,7 @@ public class CommandCenter implements SOSListener {
     private ArrayList<Unit> emergencyUnits = new ArrayList<>();
 
     public CommandCenter() throws Exception {
-        engine = new Simulator();
+        engine = new Simulator(this);
     }
 
     @Override
