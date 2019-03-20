@@ -2,7 +2,6 @@ package model.units;
 
 import model.events.WorldListener;
 import simulation.Address;
-import simulation.Rescuable;
 
 public class FireTruck extends FireUnit {
 

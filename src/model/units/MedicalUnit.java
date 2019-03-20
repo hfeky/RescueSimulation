@@ -19,6 +19,6 @@ public abstract class MedicalUnit extends Unit {
 
     public void heal() {
         Citizen citizen = (Citizen) getTarget();
-        citizen.setHp(Math.min(citizen.getHp() + healingAmount, 100));
+        citizen.setHp(citizen.getHp() + healingAmount);
     }
 }

@@ -69,10 +69,9 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setHp(int hp) {
-        if (0 <= hp && hp <= 100) {
-            this.hp = hp;
-            if (hp == 0) state = CitizenState.DECEASED;
-        }
+        hp = Math.min(Math.max(hp, 0), 100);
+        this.hp = hp;
+        if (hp == 0) state = CitizenState.DECEASED;
     }
 
     public int getBloodLoss() {
@@ -80,10 +79,9 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setBloodLoss(int bloodLoss) {
-        if (0 <= bloodLoss && bloodLoss <= 100) {
-            this.bloodLoss = bloodLoss;
-            if (bloodLoss == 100) setHp(0);
-        }
+        bloodLoss = Math.min(Math.max(bloodLoss, 0), 100);
+        this.bloodLoss = bloodLoss;
+        if (bloodLoss == 100) setHp(0);
     }
 
     public int getToxicity() {
@@ -91,29 +89,28 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setToxicity(int toxicity) {
-        if (0 <= toxicity && toxicity <= 100) {
-            this.toxicity = toxicity;
-            if (toxicity == 100) setHp(0);
-        }
+        toxicity = Math.min(Math.max(toxicity, 0), 100);
+        this.toxicity = toxicity;
+        if (toxicity == 100) setHp(0);
     }
 
     @Override
     public void cycleStep() {
         if (disaster instanceof Injury) {
             if (0 < bloodLoss && bloodLoss < 30) {
-                setHp(Math.max(hp - 5, 0));
+                setHp(hp - 5);
             } else if (30 <= bloodLoss && bloodLoss < 70) {
-                setHp(Math.max(hp - 10, 0));
+                setHp(hp - 10);
             } else if (70 <= bloodLoss) {
-                setHp(Math.max(hp - 15, 0));
+                setHp(hp - 15);
             }
         } else if (disaster instanceof Infection) {
             if (0 < toxicity && toxicity < 30) {
-                setHp(Math.max(hp - 5, 0));
+                setHp(hp - 5);
             } else if (30 <= toxicity && toxicity < 70) {
-                setHp(Math.max(hp - 10, 0));
+                setHp(hp - 10);
             } else if (70 <= toxicity) {
-                setHp(Math.max(hp - 15, 0));
+                setHp(hp - 15);
             }
         }
     }
