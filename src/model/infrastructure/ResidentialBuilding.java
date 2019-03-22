@@ -98,6 +98,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     @Override
     public void cycleStep() {
         if (disaster instanceof Collapse) {
+            setFireDamage(0);
             if (foundationDamage > 0) {
                 setStructuralIntegrity(structuralIntegrity - new Random().nextInt(6) + 5);
             }
