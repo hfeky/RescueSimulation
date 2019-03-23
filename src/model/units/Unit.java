@@ -103,7 +103,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
                                 target = null;
                                 setState(UnitState.IDLE);
                             }
-                        } else if (evacuator.getPassengers().size() == evacuator.getMaxCapacity()) {
+                        } else if (evacuator.getPassengers().size() <= evacuator.getMaxCapacity()) {
                             // Return to base
                             int movedDistance;
                             if (evacuator.getDistanceToBase() - getStepsPerCycle() < 0) {
@@ -115,13 +115,16 @@ public abstract class Unit implements Simulatable, SOSResponder {
                             evacuator.setDistanceToTarget(distanceToTarget + movedDistance);
                             if (evacuator.getDistanceToBase() == 0) {
                                 worldListener.assignAddress(this, 0, 0);
+                                for (Citizen citizen : evacuator.getPassengers()) {
+                                    worldListener.assignAddress(citizen, 0, 0);
+                                }
                             }
                         } else if (distanceToTarget == 0 && evacuator.getPassengers().isEmpty()) {
                             int capacityToFill = evacuator.getMaxCapacity() - evacuator.getPassengers().size();
                             for (int i = 0; i < Math.min(building.getOccupants().size(), capacityToFill); i++) {
                                 evacuator.getPassengers().add(building.getOccupants().remove(building.getOccupants().size() - 1));
                             }
-                        } else if (building.getOccupants().size() > 0){
+                        } else if (building.getOccupants().size() > 0) {
                             // Go to target
                             int movedDistance;
                             if (distanceToTarget - getStepsPerCycle() < 0) {
@@ -215,14 +218,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
             }
         }
         target = r;
-        if (r instanceof Citizen) {
-            Citizen citizen = (Citizen) r;
-            setDistanceToTarget(Math.abs(citizen.getLocation().getX() - getLocation().getX()) +
-                    Math.abs(citizen.getLocation().getY() - getLocation().getY()));
-        } else if (r instanceof ResidentialBuilding) {
-            ResidentialBuilding building = (ResidentialBuilding) r;
-            setDistanceToTarget(Math.abs(building.getLocation().getX() - getLocation().getX()) +
-                    Math.abs(building.getLocation().getY() - getLocation().getY()));
-        }
+        setDistanceToTarget(Math.abs(target.getLocation().getX() - getLocation().getX()) +
+                Math.abs(target.getLocation().getY() - getLocation().getY()));
     }
 }

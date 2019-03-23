@@ -28,4 +28,8 @@ public class CommandCenter implements SOSListener {
             visibleBuildings.add((ResidentialBuilding) r);
         }
     }
+
+    public static void main(String[] args) throws Exception {
+        CommandCenter commandCenter = new CommandCenter();
+    }
 }

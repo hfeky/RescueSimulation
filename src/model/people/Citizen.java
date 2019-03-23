@@ -117,7 +117,7 @@ public class Citizen implements Simulatable, Rescuable {
 
     @Override
     public void struckBy(Disaster d) {
-        state = IN_TROUBLE;
+        setState(CitizenState.IN_TROUBLE);
         disaster = d;
         emergencyService.receiveSOSCall(this);
     }
