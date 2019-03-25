@@ -31,7 +31,7 @@ public class Simulator implements WorldListener {
                 world[i][j] = new Address(i, j);
             }
         }
-        setSOSListener(sosListener);
+        setEmergencyService(sosListener);
         loadBuildings("buildings.csv");
         loadCitizens("citizens.csv");
         loadUnits("units.csv");
@@ -43,7 +43,7 @@ public class Simulator implements WorldListener {
         while (input.hasNext()) {
             String[] cells = input.nextLine().split(",");
             ResidentialBuilding building = new ResidentialBuilding(world[Integer.parseInt(cells[0])][Integer.parseInt(cells[1])]);
-            building.setSOSListener(emergencyService);
+            building.setEmergencyService(emergencyService);
             buildings.add(building);
         }
     }
@@ -54,7 +54,7 @@ public class Simulator implements WorldListener {
             String[] cells = input.nextLine().split(",");
             Citizen citizen = new Citizen(world[Integer.parseInt(cells[0])][Integer.parseInt(cells[1])],
                     cells[2], cells[3], Integer.parseInt(cells[4]), this);
-            citizen.setSOSListener(emergencyService);
+            citizen.setEmergencyService(emergencyService);
             citizens.add(citizen);
             for (ResidentialBuilding building : buildings) {
                 if (building.getLocation().getX() == citizen.getLocation().getX() &&
@@ -77,7 +77,7 @@ public class Simulator implements WorldListener {
                     emergencyUnits.add(new DiseaseControlUnit(cells[1], world[0][0], Integer.parseInt(cells[2]), this));
                     break;
                 case "EVC":
-                    emergencyUnits.add(new Evacuator(cells[1], world[0][0], Integer.parseInt(cells[2]), Integer.parseInt(cells[3]), this));
+                    emergencyUnits.add(new Evacuator(cells[1], world[0][0], Integer.parseInt(cells[2]), this, Integer.parseInt(cells[3])));
                     break;
                 case "FTK":
                     emergencyUnits.add(new FireTruck(cells[1], world[0][0], Integer.parseInt(cells[2]), this));
@@ -145,19 +145,14 @@ public class Simulator implements WorldListener {
         return emergencyUnits;
     }
 
-    public void setSOSListener(SOSListener sosListener) {
+    public void setEmergencyService(SOSListener sosListener) {
         this.emergencyService = sosListener;
     }
 
-    private boolean checkGameOver() {
+    public boolean checkGameOver() {
         if (plannedDisasters.size() > 0) return false;
-        for (Citizen citizen : citizens) {
-            Disaster disaster = citizen.getDisaster();
-            if (disaster != null && disaster.isActive() && citizen.getState() != CitizenState.DECEASED) return false;
-        }
-        for (ResidentialBuilding building : buildings) {
-            Disaster disaster = building.getDisaster();
-            if (disaster != null && disaster.isActive() && building.getStructuralIntegrity() != 0) return false;
+        for (Disaster disaster : executedDisasters) {
+            if (disaster.isActive()) return false;
         }
         for (Unit unit : emergencyUnits) {
             if (unit.getState() != UnitState.IDLE) return false;
@@ -165,7 +160,7 @@ public class Simulator implements WorldListener {
         return true;
     }
 
-    private int calculateCasualties() {
+    public int calculateCasualties() {
         int casualties = 0;
         for (Citizen citizen : citizens) {
             if (citizen.getState() == CitizenState.DECEASED) casualties++;
@@ -176,7 +171,8 @@ public class Simulator implements WorldListener {
     public void nextCycle() {
         if (!checkGameOver()) {
             currentCycle++;
-            for (Disaster disaster : plannedDisasters) {
+            for (int i = 0; i < plannedDisasters.size();) {
+                Disaster disaster = plannedDisasters.get(i);
                 if (disaster.getStartCycle() == currentCycle) {
                     plannedDisasters.remove(disaster);
                     Disaster newDisaster = null;
@@ -205,6 +201,8 @@ public class Simulator implements WorldListener {
                         disaster.strike();
                         executedDisasters.add(disaster);
                     }
+                } else {
+                    i++;
                 }
             }
             for (ResidentialBuilding building : buildings) {

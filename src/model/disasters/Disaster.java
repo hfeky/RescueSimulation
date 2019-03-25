@@ -32,5 +32,6 @@ public abstract class Disaster implements Simulatable {
 
     public void strike() {
         setActive(true);
+        target.struckBy(this);
     }
 }

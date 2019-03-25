@@ -1,6 +1,5 @@
 package model.units;
 
-import model.disasters.*;
 import model.events.SOSResponder;
 import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
@@ -70,77 +69,85 @@ public abstract class Unit implements Simulatable, SOSResponder {
     }
 
     public void cycleStep() {
-        if (state == UnitState.RESPONDING) {
-            if (target instanceof Citizen) {
-                Citizen citizen = (Citizen) target;
-                if (citizen.getState() == CitizenState.DECEASED) {
-                    target = null;
-                    setState(UnitState.IDLE);
-                } else {
+        if (this instanceof Evacuator) {
+            Evacuator evacuator = (Evacuator) this;
+            ResidentialBuilding building = (ResidentialBuilding) target;
+            if (state == UnitState.RESPONDING || state == UnitState.TREATING) {
+                if (evacuator.getPassengers().isEmpty()) {
                     if (distanceToTarget == 0) {
-                        treat();
+                        // Fill citizens
+                        System.out.println("Filling citizens");
+                        evacuator.treat();
+                        evacuator.setDistanceToBase(getLocation().getX() + getLocation().getY());
                     } else {
-                        distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
+                        // Go to target
+                        System.out.println("Going to target");
+                        setState(UnitState.RESPONDING);
+                        int movedDistance;
+                        if (distanceToTarget - getStepsPerCycle() < 0) {
+                            movedDistance = distanceToTarget;
+                        } else {
+                            movedDistance = getStepsPerCycle();
+                        }
+                        evacuator.setDistanceToTarget(distanceToTarget - movedDistance);
+                        evacuator.setDistanceToBase(evacuator.getDistanceToBase() + movedDistance);
                         if (distanceToTarget == 0) {
                             worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
                         }
                     }
-                }
-            } else {
-                ResidentialBuilding building = (ResidentialBuilding) target;
-                if (building.getStructuralIntegrity() == 0) {
-                    target = null;
-                    setState(UnitState.IDLE);
                 } else {
-                    if (this instanceof Evacuator) {
-                        Evacuator evacuator = (Evacuator) this;
-                        if (evacuator.getDistanceToBase() == 0 && !evacuator.getPassengers().isEmpty()) {
+                    if (evacuator.getDistanceToBase() == 0) {
+                        // Evacuate citizens
+                        System.out.println("Evacuating citizens");
+                        while (!evacuator.getPassengers().isEmpty()) {
+                            Citizen citizen = evacuator.getPassengers().get(0);
+                            citizen.setState(CitizenState.RESCUED);
+                            evacuator.getPassengers().remove(citizen);
+                        }
+                        if (building.getStructuralIntegrity() == 0 || building.getOccupants().size() == 0) {
+                            jobsDone();
+                        }
+                    } else {
+                        // Return to base
+                        System.out.println("Returning to base");
+                        int movedDistance;
+                        if (evacuator.getDistanceToBase() - getStepsPerCycle() < 0) {
+                            movedDistance = evacuator.getDistanceToBase();
+                        } else {
+                            movedDistance = getStepsPerCycle();
+                        }
+                        evacuator.setDistanceToBase(evacuator.getDistanceToBase() - movedDistance);
+                        evacuator.setDistanceToTarget(distanceToTarget + movedDistance);
+                        if (evacuator.getDistanceToBase() == 0) {
+                            worldListener.assignAddress(this, 0, 0);
                             for (Citizen citizen : evacuator.getPassengers()) {
-                                citizen.setState(CitizenState.RESCUED);
-                                evacuator.getPassengers().remove(citizen);
+                                worldListener.assignAddress(citizen, 0, 0);
                             }
-                            if (building.getStructuralIntegrity() == 0 || building.getOccupants().size() == 0) {
-                                target = null;
-                                setState(UnitState.IDLE);
-                            }
-                        } else if (evacuator.getPassengers().size() <= evacuator.getMaxCapacity()) {
-                            // Return to base
-                            int movedDistance;
-                            if (evacuator.getDistanceToBase() - getStepsPerCycle() < 0) {
-                                movedDistance = evacuator.getDistanceToBase();
-                            } else {
-                                movedDistance = getStepsPerCycle();
-                            }
-                            evacuator.setDistanceToBase(evacuator.getDistanceToBase() - movedDistance);
-                            evacuator.setDistanceToTarget(distanceToTarget + movedDistance);
-                            if (evacuator.getDistanceToBase() == 0) {
-                                worldListener.assignAddress(this, 0, 0);
-                                for (Citizen citizen : evacuator.getPassengers()) {
-                                    worldListener.assignAddress(citizen, 0, 0);
-                                }
-                            }
-                        } else if (distanceToTarget == 0 && evacuator.getPassengers().isEmpty()) {
-                            int capacityToFill = evacuator.getMaxCapacity() - evacuator.getPassengers().size();
-                            for (int i = 0; i < Math.min(building.getOccupants().size(), capacityToFill); i++) {
-                                evacuator.getPassengers().add(building.getOccupants().remove(building.getOccupants().size() - 1));
-                            }
-                        } else if (building.getOccupants().size() > 0) {
-                            // Go to target
-                            int movedDistance;
-                            if (distanceToTarget - getStepsPerCycle() < 0) {
-                                movedDistance = distanceToTarget;
-                            } else {
-                                movedDistance = getStepsPerCycle();
-                            }
-                            evacuator.setDistanceToTarget(distanceToTarget - movedDistance);
-                            evacuator.setDistanceToBase(evacuator.getDistanceToBase() + movedDistance);
+                        }
+                    }
+                }
+                System.out.println("distanceToTarget: " + distanceToTarget + "\ndistanceToBase: " + evacuator.getDistanceToBase() + "\n");
+            }
+        } else {
+            if (state == UnitState.RESPONDING) {
+                if (target instanceof Citizen) {
+                    Citizen citizen = (Citizen) target;
+                    if (citizen.getState() == CitizenState.DECEASED) {
+                        jobsDone();
+                    } else {
+                        if (distanceToTarget == 0) {
+                            treat();
+                        } else {
+                            distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
                             if (distanceToTarget == 0) {
                                 worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
                             }
-                        } else {
-                            target = null;
-                            setState(UnitState.IDLE);
                         }
+                    }
+                } else {
+                    ResidentialBuilding building = (ResidentialBuilding) target;
+                    if (building.getStructuralIntegrity() == 0) {
+                        jobsDone();
                     } else {
                         if (distanceToTarget == 0) {
                             treat();
@@ -152,56 +159,20 @@ public abstract class Unit implements Simulatable, SOSResponder {
                         }
                     }
                 }
+            } else if (state == UnitState.TREATING) {
+                treat();
             }
         }
     }
 
-    private void treat() {
-        Disaster disaster = target.getDisaster();
-        disaster.setActive(false);
+    public void treat() {
+        target.getDisaster().setActive(false);
         setState(UnitState.TREATING);
-        if (target instanceof ResidentialBuilding) {
-            ResidentialBuilding building = (ResidentialBuilding) target;
-            int treatmentAmount = 10;
-            if (disaster instanceof Collapse) {
-                building.setFoundationDamage(building.getFoundationDamage() - treatmentAmount);
-            } else if (disaster instanceof Fire) {
-                building.setFireDamage(building.getFireDamage() - treatmentAmount);
-            } else if (disaster instanceof GasLeak) {
-                building.setGasLevel(building.getGasLevel() - treatmentAmount);
-            }
-        } else if (target instanceof Citizen) {
-            Citizen citizen = (Citizen) target;
-            int treatmentAmount = ((MedicalUnit) this).getTreatmentAmount();
-            if (citizen.getBloodLoss() != 0 || citizen.getToxicity() != 0) {
-                if (disaster instanceof Injury) {
-                    citizen.setBloodLoss(citizen.getBloodLoss() - treatmentAmount);
-                } else if (disaster instanceof Infection) {
-                    citizen.setToxicity(citizen.getToxicity() - treatmentAmount);
-                }
-                if (citizen.getBloodLoss() == 0 && citizen.getToxicity() == 0) {
-                    citizen.setState(CitizenState.RESCUED);
-                }
-            } else {
-                ((MedicalUnit) this).heal();
-            }
-        }
-        jobsDone();
     }
 
-    private void jobsDone() {
-        if (target instanceof Citizen) {
-            Citizen citizen = (Citizen) target;
-            if (citizen.getState() == CitizenState.RESCUED || citizen.getState() == CitizenState.DECEASED) {
-                state = UnitState.IDLE;
-            }
-        } else if (target instanceof ResidentialBuilding) {
-            ResidentialBuilding building = (ResidentialBuilding) target;
-            if ((building.getFireDamage() == 0 && building.getFoundationDamage() == 0 && building.getGasLevel() == 0) ||
-                    building.getStructuralIntegrity() == 0) {
-                state = UnitState.IDLE;
-            }
-        }
+    public void jobsDone() {
+        target = null;
+        setState(UnitState.IDLE);
     }
 
     @Override

@@ -13,7 +13,7 @@ public abstract class PoliceUnit extends Unit {
     private ArrayList<Citizen> passengers = new ArrayList<>();
     private int distanceToBase;
 
-    public PoliceUnit(String id, Address location, int stepsPerCycle, int maxCapacity, WorldListener worldListener) {
+    public PoliceUnit(String id, Address location, int stepsPerCycle, WorldListener worldListener, int maxCapacity) {
         super(id, location, stepsPerCycle, worldListener);
         this.maxCapacity = maxCapacity;
     }

@@ -1,15 +1,11 @@
 package model.people;
 
 import model.disasters.Disaster;
-import model.disasters.Infection;
-import model.disasters.Injury;
 import model.events.SOSListener;
 import model.events.WorldListener;
 import simulation.Address;
 import simulation.Rescuable;
 import simulation.Simulatable;
-
-import static model.people.CitizenState.IN_TROUBLE;
 
 public class Citizen implements Simulatable, Rescuable {
 
@@ -96,22 +92,19 @@ public class Citizen implements Simulatable, Rescuable {
 
     @Override
     public void cycleStep() {
-        if (disaster instanceof Injury) {
-            if (0 < bloodLoss && bloodLoss < 30) {
-                setHp(hp - 5);
-            } else if (30 <= bloodLoss && bloodLoss < 70) {
-                setHp(hp - 10);
-            } else if (70 <= bloodLoss) {
-                setHp(hp - 15);
-            }
-        } else if (disaster instanceof Infection) {
-            if (0 < toxicity && toxicity < 30) {
-                setHp(hp - 5);
-            } else if (30 <= toxicity && toxicity < 70) {
-                setHp(hp - 10);
-            } else if (70 <= toxicity) {
-                setHp(hp - 15);
-            }
+        if (0 < bloodLoss && bloodLoss < 30) {
+            setHp(hp - 5);
+        } else if (30 <= bloodLoss && bloodLoss < 70) {
+            setHp(hp - 10);
+        } else if (70 <= bloodLoss) {
+            setHp(hp - 15);
+        }
+        if (0 < toxicity && toxicity < 30) {
+            setHp(hp - 5);
+        } else if (30 <= toxicity && toxicity < 70) {
+            setHp(hp - 10);
+        } else if (70 <= toxicity) {
+            setHp(hp - 15);
         }
     }
 
@@ -122,7 +115,7 @@ public class Citizen implements Simulatable, Rescuable {
         emergencyService.receiveSOSCall(this);
     }
 
-    public void setSOSListener(SOSListener sosListener) {
+    public void setEmergencyService(SOSListener sosListener) {
         this.emergencyService = sosListener;
     }
 

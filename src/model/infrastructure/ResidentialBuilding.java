@@ -2,7 +2,6 @@ package model.infrastructure;
 
 import model.disasters.Collapse;
 import model.disasters.Disaster;
-import model.disasters.Fire;
 import model.events.SOSListener;
 import model.people.Citizen;
 import simulation.Address;
@@ -102,18 +101,17 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
             if (foundationDamage > 0) {
                 setStructuralIntegrity(structuralIntegrity - new Random().nextInt(6) + 5);
             }
-        } else if (disaster instanceof Fire) {
-            if (0 < fireDamage && fireDamage < 30) {
-                setStructuralIntegrity(structuralIntegrity - 3);
-            } else if (30 <= fireDamage && fireDamage < 70) {
-                setStructuralIntegrity(structuralIntegrity - 5);
-            } else if (70 <= fireDamage) {
-                setStructuralIntegrity(structuralIntegrity - 7);
-            }
+        }
+        if (0 < fireDamage && fireDamage < 30) {
+            setStructuralIntegrity(structuralIntegrity - 3);
+        } else if (30 <= fireDamage && fireDamage < 70) {
+            setStructuralIntegrity(structuralIntegrity - 5);
+        } else if (70 <= fireDamage) {
+            setStructuralIntegrity(structuralIntegrity - 7);
         }
     }
 
-    public void setSOSListener(SOSListener sosListener) {
+    public void setEmergencyService(SOSListener sosListener) {
         this.emergencyService = sosListener;
     }
 }
