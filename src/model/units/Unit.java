@@ -104,6 +104,8 @@ public abstract class Unit implements Simulatable, SOSResponder {
                             citizen.setState(CitizenState.RESCUED);
                             evacuator.getPassengers().remove(citizen);
                         }
+                        evacuator.setDistanceToTarget(Math.abs(target.getLocation().getX() - getLocation().getX()) +
+                                Math.abs(target.getLocation().getY() - getLocation().getY()));
                         if (building.getStructuralIntegrity() == 0 || building.getOccupants().size() == 0) {
                             jobsDone();
                         }
@@ -130,34 +132,17 @@ public abstract class Unit implements Simulatable, SOSResponder {
             }
         } else {
             if (state == UnitState.RESPONDING) {
-                if (target instanceof Citizen) {
-                    Citizen citizen = (Citizen) target;
-                    if (citizen.getState() == CitizenState.DECEASED) {
-                        jobsDone();
-                    } else {
-                        if (distanceToTarget == 0) {
-                            worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
-                            treat();
-                        } else {
-                            distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
-                            if (distanceToTarget == 0) {
-                                worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
-                            }
-                        }
-                    }
+                if ((target instanceof Citizen && ((Citizen) target).getState() == CitizenState.DECEASED) ||
+                        (target instanceof ResidentialBuilding && ((ResidentialBuilding) target).getStructuralIntegrity() == 0)) {
+                    jobsDone();
                 } else {
-                    ResidentialBuilding building = (ResidentialBuilding) target;
-                    if (building.getStructuralIntegrity() == 0) {
-                        jobsDone();
+                    if (distanceToTarget == 0) {
+                        worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
+                        treat();
                     } else {
+                        distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
                         if (distanceToTarget == 0) {
                             worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
-                            treat();
-                        } else {
-                            distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
-                            if (distanceToTarget == 0) {
-                                worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
-                            }
                         }
                     }
                 }
