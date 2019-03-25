@@ -136,6 +136,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
                         jobsDone();
                     } else {
                         if (distanceToTarget == 0) {
+                            worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
                             treat();
                         } else {
                             distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
@@ -150,6 +151,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
                         jobsDone();
                     } else {
                         if (distanceToTarget == 0) {
+                            worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
                             treat();
                         } else {
                             distanceToTarget = Math.max(distanceToTarget - stepsPerCycle, 0);
