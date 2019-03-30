@@ -83,16 +83,14 @@ public abstract class Unit implements Simulatable, SOSResponder {
                         // Go to target
                         System.out.println("Going to target");
                         setState(UnitState.RESPONDING);
-                        int movedDistance;
-                        if (distanceToTarget - getStepsPerCycle() < 0) {
-                            movedDistance = distanceToTarget;
-                        } else {
-                            movedDistance = getStepsPerCycle();
-                        }
+                        int movedDistance = distanceToTarget - getStepsPerCycle() < 0 ? distanceToTarget : getStepsPerCycle();
                         evacuator.setDistanceToTarget(distanceToTarget - movedDistance);
                         evacuator.setDistanceToBase(evacuator.getDistanceToBase() + movedDistance);
                         if (distanceToTarget == 0) {
                             worldListener.assignAddress(this, target.getLocation().getX(), target.getLocation().getY());
+                        }
+                        if (building.getStructuralIntegrity() == 0 || building.getOccupants().size() == 0) {
+                            jobsDone();
                         }
                     }
                 } else {
@@ -112,12 +110,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
                     } else {
                         // Return to base
                         System.out.println("Returning to base");
-                        int movedDistance;
-                        if (evacuator.getDistanceToBase() - getStepsPerCycle() < 0) {
-                            movedDistance = evacuator.getDistanceToBase();
-                        } else {
-                            movedDistance = getStepsPerCycle();
-                        }
+                        int movedDistance = evacuator.getDistanceToBase() - getStepsPerCycle() < 0 ? evacuator.getDistanceToBase() : getStepsPerCycle();
                         evacuator.setDistanceToBase(evacuator.getDistanceToBase() - movedDistance);
                         evacuator.setDistanceToTarget(distanceToTarget + movedDistance);
                         if (evacuator.getDistanceToBase() == 0) {
