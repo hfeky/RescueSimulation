@@ -65,9 +65,8 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setHp(int hp) {
-        hp = Math.min(Math.max(hp, 0), 100);
-        this.hp = hp;
-        if (hp == 0) state = CitizenState.DECEASED;
+        this.hp = Math.min(Math.max(hp, 0), 100);
+        if (this.hp == 0) state = CitizenState.DECEASED;
     }
 
     public int getBloodLoss() {
@@ -75,9 +74,8 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setBloodLoss(int bloodLoss) {
-        bloodLoss = Math.min(Math.max(bloodLoss, 0), 100);
-        this.bloodLoss = bloodLoss;
-        if (bloodLoss == 100) setHp(0);
+        this.bloodLoss = Math.min(Math.max(bloodLoss, 0), 100);
+        if (this.bloodLoss == 100) setHp(0);
     }
 
     public int getToxicity() {
@@ -85,9 +83,8 @@ public class Citizen implements Simulatable, Rescuable {
     }
 
     public void setToxicity(int toxicity) {
-        toxicity = Math.min(Math.max(toxicity, 0), 100);
-        this.toxicity = toxicity;
-        if (toxicity == 100) setHp(0);
+        this.toxicity = Math.min(Math.max(toxicity, 0), 100);
+        if (this.toxicity == 100) setHp(0);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package model.infrastructure;
 
-import model.disasters.Collapse;
 import model.disasters.Disaster;
 import model.events.SOSListener;
 import model.people.Citizen;
@@ -46,9 +45,8 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setStructuralIntegrity(int structuralIntegrity) {
-        structuralIntegrity = Math.max(structuralIntegrity, 0);
-        this.structuralIntegrity = structuralIntegrity;
-        if (structuralIntegrity == 0) {
+        this.structuralIntegrity = Math.max(structuralIntegrity, 0);
+        if (this.structuralIntegrity == 0) {
             for (Citizen citizen : occupants) {
                 citizen.setHp(0);
             }
@@ -60,8 +58,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setFireDamage(int fireDamage) {
-        fireDamage = Math.min(Math.max(fireDamage, 0), 100);
-        this.fireDamage = fireDamage;
+        this.fireDamage = Math.min(Math.max(fireDamage, 0), 100);
     }
 
     public int getFoundationDamage() {
@@ -69,9 +66,8 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setFoundationDamage(int foundationDamage) {
-        foundationDamage = Math.max(foundationDamage, 0);
-        this.foundationDamage = foundationDamage;
-        if (foundationDamage >= 100) {
+        this.foundationDamage = Math.max(foundationDamage, 0);
+        if (this.foundationDamage >= 100) {
             setStructuralIntegrity(0);
         }
     }
@@ -81,9 +77,8 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     }
 
     public void setGasLevel(int gasLevel) {
-        gasLevel = Math.min(Math.max(gasLevel, 0), 100);
-        this.gasLevel = gasLevel;
-        if (gasLevel == 100) {
+        this.gasLevel = Math.min(Math.max(gasLevel, 0), 100);
+        if (this.gasLevel == 100) {
             for (Citizen citizen : occupants) {
                 citizen.setHp(0);
             }
@@ -96,11 +91,8 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
 
     @Override
     public void cycleStep() {
-        if (disaster instanceof Collapse) {
-            setFireDamage(0);
-            if (foundationDamage > 0) {
-                setStructuralIntegrity(structuralIntegrity - new Random().nextInt(6) + 5);
-            }
+        if (foundationDamage > 0) {
+            setStructuralIntegrity(structuralIntegrity - new Random().nextInt(6) + 5);
         }
         if (0 < fireDamage && fireDamage < 30) {
             setStructuralIntegrity(structuralIntegrity - 3);

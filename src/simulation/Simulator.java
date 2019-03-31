@@ -169,61 +169,73 @@ public class Simulator implements WorldListener {
     }
 
     public void nextCycle() {
-        if (!checkGameOver()) {
-            currentCycle++;
-            for (int i = 0; i < plannedDisasters.size();) {
-                Disaster disaster = plannedDisasters.get(i);
-                if (disaster.getStartCycle() == currentCycle) {
-                    plannedDisasters.remove(disaster);
-                    Disaster newDisaster = null;
-                    if (disaster.getTarget() instanceof ResidentialBuilding) {
-                        ResidentialBuilding building = (ResidentialBuilding) disaster.getTarget();
-                        Disaster currentDisaster = building.getDisaster();
-                        if (currentDisaster instanceof GasLeak && disaster instanceof Fire) {
-                            int gasLevel = building.getGasLevel();
-                            if (gasLevel == 0) {
-                                newDisaster = disaster;
-                            } else if (0 < gasLevel && gasLevel < 70) {
-                                newDisaster = new Collapse(currentCycle, building);
-                            } else if (70 <= gasLevel) {
-                                building.setStructuralIntegrity(0);
-                            }
-                        } else if (currentDisaster instanceof Fire && disaster instanceof GasLeak) {
-                            newDisaster = new Collapse(currentCycle, building);
-                        } else {
+        currentCycle++;
+        for (int i = 0; i < plannedDisasters.size(); ) {
+            Disaster disaster = plannedDisasters.get(i);
+            if (disaster.getStartCycle() == currentCycle) {
+                plannedDisasters.remove(disaster);
+                Disaster newDisaster = null;
+                if (disaster.getTarget() instanceof ResidentialBuilding) {
+                    ResidentialBuilding building = (ResidentialBuilding) disaster.getTarget();
+                    Disaster currentDisaster = building.getDisaster();
+                    if (currentDisaster instanceof GasLeak && disaster instanceof Fire) {
+                        int gasLevel = building.getGasLevel();
+                        if (gasLevel == 0) {
                             newDisaster = disaster;
+                        } else if (0 < gasLevel && gasLevel < 70) {
+                            newDisaster = new Collapse(currentCycle, building);
+                        } else if (70 <= gasLevel) {
+                            building.setStructuralIntegrity(0);
                         }
-                        if (newDisaster != null && building.getFireDamage() != 100) {
-                            newDisaster.strike();
-                            executedDisasters.add(newDisaster);
-                        }
+                    } else if (currentDisaster instanceof Fire && disaster instanceof GasLeak) {
+                        newDisaster = new Collapse(currentCycle, building);
                     } else {
-                        disaster.strike();
-                        executedDisasters.add(disaster);
+                        newDisaster = disaster;
+                    }
+                    if (newDisaster != null && building.getFireDamage() != 100) {
+                        if (newDisaster instanceof Collapse) {
+                            for (Disaster exDisaster : executedDisasters) {
+                                if (exDisaster.isActive() && exDisaster.getTarget() == newDisaster.getTarget()) {
+                                    exDisaster.setActive(false);
+                                }
+                            }
+                            building.setFireDamage(0);
+                        }
+                        newDisaster.strike();
+                        executedDisasters.add(newDisaster);
                     }
                 } else {
-                    i++;
+                    disaster.strike();
+                    executedDisasters.add(disaster);
                 }
+            } else {
+                i++;
             }
-            for (ResidentialBuilding building : buildings) {
-                if (building.getFireDamage() == 100) {
-                    Collapse collapse = new Collapse(currentCycle, building);
-                    collapse.strike();
-                    executedDisasters.add(collapse);
+        }
+        for (ResidentialBuilding building : buildings) {
+            if (building.getFireDamage() == 100) {
+                Collapse collapse = new Collapse(currentCycle, building);
+                for (Disaster exDisaster : executedDisasters) {
+                    if (exDisaster.isActive() && exDisaster.getTarget() == collapse.getTarget()) {
+                        exDisaster.setActive(false);
+                    }
                 }
+                building.setFireDamage(0);
+                collapse.strike();
+                executedDisasters.add(collapse);
             }
-            for (Unit unit : emergencyUnits) {
-                unit.cycleStep();
-            }
-            for (Disaster disaster : executedDisasters) {
-                if (disaster.isActive() && disaster.getStartCycle() < currentCycle) disaster.cycleStep();
-            }
-            for (ResidentialBuilding building : buildings) {
-                building.cycleStep();
-            }
-            for (Citizen citizen : citizens) {
-                citizen.cycleStep();
-            }
+        }
+        for (Unit unit : emergencyUnits) {
+            unit.cycleStep();
+        }
+        for (Disaster disaster : executedDisasters) {
+            if (disaster.isActive() && disaster.getStartCycle() < currentCycle) disaster.cycleStep();
+        }
+        for (ResidentialBuilding building : buildings) {
+            building.cycleStep();
+        }
+        for (Citizen citizen : citizens) {
+            citizen.cycleStep();
         }
     }
 }
