@@ -194,11 +194,7 @@ public class Simulator implements WorldListener {
                     }
                     if (newDisaster != null && building.getFireDamage() != 100) {
                         if (newDisaster instanceof Collapse) {
-                            for (Disaster exDisaster : executedDisasters) {
-                                if (exDisaster.isActive() && exDisaster.getTarget() == newDisaster.getTarget()) {
-                                    exDisaster.setActive(false);
-                                }
-                            }
+                            building.getDisaster().setActive(false);
                             building.setFireDamage(0);
                         }
                         newDisaster.strike();
@@ -215,11 +211,7 @@ public class Simulator implements WorldListener {
         for (ResidentialBuilding building : buildings) {
             if (building.getFireDamage() == 100) {
                 Collapse collapse = new Collapse(currentCycle, building);
-                for (Disaster exDisaster : executedDisasters) {
-                    if (exDisaster.isActive() && exDisaster.getTarget() == collapse.getTarget()) {
-                        exDisaster.setActive(false);
-                    }
-                }
+                building.getDisaster().setActive(false);
                 building.setFireDamage(0);
                 collapse.strike();
                 executedDisasters.add(collapse);

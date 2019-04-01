@@ -15,7 +15,7 @@ public class Ambulance extends MedicalUnit {
     public void treat() {
         super.treat();
         Citizen citizen = (Citizen) getTarget();
-        if (citizen.getBloodLoss() != 0) {
+        if (citizen.getBloodLoss() > 0) {
             citizen.setBloodLoss(citizen.getBloodLoss() - getTreatmentAmount());
             if (citizen.getBloodLoss() == 0) {
                 citizen.setState(CitizenState.RESCUED);
