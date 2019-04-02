@@ -152,7 +152,16 @@ public class Simulator implements WorldListener {
     public boolean checkGameOver() {
         if (plannedDisasters.size() > 0) return false;
         for (Disaster disaster : executedDisasters) {
-            if (disaster.isActive()) return false;
+            if (disaster.isActive()) {
+                Rescuable target = disaster.getTarget();
+                if (target instanceof Citizen) {
+                    Citizen citizen = (Citizen) target;
+                    if (citizen.getState() != CitizenState.DECEASED) return false;
+                } else {
+                    ResidentialBuilding building = (ResidentialBuilding) target;
+                    if (building.getStructuralIntegrity() != 0) return false;
+                }
+            }
         }
         for (Unit unit : emergencyUnits) {
             if (unit.getState() != UnitState.IDLE) return false;
@@ -194,7 +203,11 @@ public class Simulator implements WorldListener {
                     }
                     if (newDisaster != null && building.getFireDamage() != 100) {
                         if (newDisaster instanceof Collapse) {
-                            building.getDisaster().setActive(false);
+                            for (Disaster exDisaster : executedDisasters) {
+                                if (exDisaster.isActive() && exDisaster.getTarget() == building) {
+                                    exDisaster.setActive(false);
+                                }
+                            }
                             building.setFireDamage(0);
                         }
                         newDisaster.strike();
@@ -211,7 +224,11 @@ public class Simulator implements WorldListener {
         for (ResidentialBuilding building : buildings) {
             if (building.getFireDamage() == 100) {
                 Collapse collapse = new Collapse(currentCycle, building);
-                building.getDisaster().setActive(false);
+                for (Disaster exDisaster : executedDisasters) {
+                    if (exDisaster.isActive() && exDisaster.getTarget() == building) {
+                        exDisaster.setActive(false);
+                    }
+                }
                 building.setFireDamage(0);
                 collapse.strike();
                 executedDisasters.add(collapse);

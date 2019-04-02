@@ -19,7 +19,6 @@ public class Ambulance extends MedicalUnit {
             citizen.setBloodLoss(citizen.getBloodLoss() - getTreatmentAmount());
             if (citizen.getBloodLoss() == 0) {
                 citizen.setState(CitizenState.RESCUED);
-                jobsDone();
             }
         } else {
             heal();
