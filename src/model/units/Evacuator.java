@@ -1,5 +1,6 @@
 package model.units;
 
+import exceptions.UnitException;
 import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
@@ -29,7 +30,7 @@ public class Evacuator extends PoliceUnit {
     }
 
     @Override
-    public void respond(Rescuable r) {
+    public void respond(Rescuable r) throws UnitException {
         super.respond(r);
         setDistanceToBase(getLocation().getX() + getLocation().getY());
     }

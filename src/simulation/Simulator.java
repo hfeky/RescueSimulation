@@ -1,5 +1,6 @@
 package simulation;
 
+import exceptions.DisasterException;
 import model.disasters.*;
 import model.events.SOSListener;
 import model.events.WorldListener;
@@ -177,7 +178,7 @@ public class Simulator implements WorldListener {
         return casualties;
     }
 
-    public void nextCycle() {
+    public void nextCycle() throws DisasterException {
         currentCycle++;
         for (int i = 0; i < plannedDisasters.size(); ) {
             Disaster disaster = plannedDisasters.get(i);

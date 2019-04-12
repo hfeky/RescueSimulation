@@ -1,5 +1,6 @@
 package model.disasters;
 
+import exceptions.DisasterException;
 import model.infrastructure.ResidentialBuilding;
 
 public class GasLeak extends Disaster {
@@ -17,7 +18,7 @@ public class GasLeak extends Disaster {
     }
 
     @Override
-    public void strike() {
+    public void strike() throws DisasterException {
         super.strike();
         residentialBuilding.setGasLevel(residentialBuilding.getGasLevel() + 10);
     }

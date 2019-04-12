@@ -1,5 +1,6 @@
 package model.disasters;
 
+import exceptions.DisasterException;
 import model.infrastructure.ResidentialBuilding;
 
 public class Fire extends Disaster {
@@ -17,7 +18,7 @@ public class Fire extends Disaster {
     }
 
     @Override
-    public void strike() {
+    public void strike() throws DisasterException {
         super.strike();
         residentialBuilding.setFireDamage(residentialBuilding.getFireDamage() + 10);
     }

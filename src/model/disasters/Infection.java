@@ -1,5 +1,6 @@
 package model.disasters;
 
+import exceptions.DisasterException;
 import model.people.Citizen;
 
 public class Infection extends Disaster {
@@ -17,7 +18,7 @@ public class Infection extends Disaster {
     }
 
     @Override
-    public void strike() {
+    public void strike() throws DisasterException {
         super.strike();
         citizen.setToxicity(citizen.getToxicity() + 25);
     }

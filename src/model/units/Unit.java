@@ -1,5 +1,8 @@
 package model.units;
 
+import exceptions.CannotTreatException;
+import exceptions.IncompatibleTargetException;
+import exceptions.UnitException;
 import model.events.SOSResponder;
 import model.events.WorldListener;
 import model.infrastructure.ResidentialBuilding;
@@ -149,7 +152,14 @@ public abstract class Unit implements Simulatable, SOSResponder {
     }
 
     @Override
-    public void respond(Rescuable r) {
+    public void respond(Rescuable r) throws UnitException {
+        if (((this instanceof FireUnit || this instanceof PoliceUnit || this instanceof GasControlUnit)
+                && r instanceof Citizen)
+                || ((this instanceof MedicalUnit || this instanceof DiseaseControlUnit)
+                && r instanceof ResidentialBuilding))
+            throw new IncompatibleTargetException(this, r);
+        if (!canTreat(r))
+            throw new CannotTreatException(this, r);
         setState(UnitState.RESPONDING);
         if (target != null) {
             if (r instanceof Citizen) {
@@ -164,5 +174,21 @@ public abstract class Unit implements Simulatable, SOSResponder {
         target = r;
         setDistanceToTarget(Math.abs(target.getLocation().getX() - getLocation().getX()) +
                 Math.abs(target.getLocation().getY() - getLocation().getY()));
+    }
+
+    public boolean canTreat(Rescuable r) {
+        if (r instanceof ResidentialBuilding) {
+            ResidentialBuilding b = (ResidentialBuilding) r;
+            if ((this instanceof FireTruck && b.getFireDamage() != 0)
+                    || (this instanceof Evacuator && b.getFoundationDamage() != 0)
+                    || (this instanceof GasControlUnit && b.getGasLevel() != 0))
+                return true;
+        } else if (r instanceof Citizen) {
+            Citizen c = (Citizen) r;
+            if ((this instanceof Ambulance && c.getBloodLoss() != 0)
+                    || (this instanceof DiseaseControlUnit && c.getToxicity() != 0))
+                return true;
+        }
+        return false;
     }
 }

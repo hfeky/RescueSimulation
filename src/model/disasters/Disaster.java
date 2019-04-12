@@ -1,5 +1,11 @@
 package model.disasters;
 
+import exceptions.BuildingAlreadyCollapsedException;
+import exceptions.CitizenAlreadyDeadException;
+import exceptions.DisasterException;
+import model.infrastructure.ResidentialBuilding;
+import model.people.Citizen;
+import model.people.CitizenState;
 import simulation.Rescuable;
 import simulation.Simulatable;
 
@@ -30,7 +36,11 @@ public abstract class Disaster implements Simulatable {
         return target;
     }
 
-    public void strike() {
+    public void strike() throws DisasterException {
+        if (target instanceof ResidentialBuilding && ((ResidentialBuilding) target).getStructuralIntegrity() == 0)
+            throw new BuildingAlreadyCollapsedException(this);
+        else if (target instanceof Citizen && ((Citizen) target).getState() == CitizenState.DECEASED)
+            throw new CitizenAlreadyDeadException(this);
         setActive(true);
         target.struckBy(this);
     }
