@@ -156,10 +156,8 @@ public abstract class Unit implements Simulatable, SOSResponder {
         if (((this instanceof FireUnit || this instanceof PoliceUnit || this instanceof GasControlUnit)
                 && r instanceof Citizen)
                 || ((this instanceof MedicalUnit || this instanceof DiseaseControlUnit)
-                && r instanceof ResidentialBuilding))
-            throw new IncompatibleTargetException(this, r);
-        if (!canTreat(r))
-            throw new CannotTreatException(this, r);
+                && r instanceof ResidentialBuilding)) throw new IncompatibleTargetException(this, r);
+        if (!canTreat(r)) throw new CannotTreatException(this, r);
         setState(UnitState.RESPONDING);
         if (target != null) {
             if (r instanceof Citizen) {
@@ -179,15 +177,13 @@ public abstract class Unit implements Simulatable, SOSResponder {
     public boolean canTreat(Rescuable r) {
         if (r instanceof ResidentialBuilding) {
             ResidentialBuilding b = (ResidentialBuilding) r;
-            if ((this instanceof FireTruck && b.getFireDamage() != 0)
+            return (this instanceof FireTruck && b.getFireDamage() != 0)
                     || (this instanceof Evacuator && b.getFoundationDamage() != 0)
-                    || (this instanceof GasControlUnit && b.getGasLevel() != 0))
-                return true;
+                    || (this instanceof GasControlUnit && b.getGasLevel() != 0);
         } else if (r instanceof Citizen) {
             Citizen c = (Citizen) r;
-            if ((this instanceof Ambulance && c.getBloodLoss() != 0)
-                    || (this instanceof DiseaseControlUnit && c.getToxicity() != 0))
-                return true;
+            return (this instanceof Ambulance && c.getBloodLoss() != 0)
+                    || (this instanceof DiseaseControlUnit && c.getToxicity() != 0);
         }
         return false;
     }
