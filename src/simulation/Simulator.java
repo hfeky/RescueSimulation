@@ -154,12 +154,12 @@ public class Simulator implements WorldListener {
         for (Disaster disaster : executedDisasters) {
             if (disaster.isActive()) {
                 Rescuable target = disaster.getTarget();
-                if (target instanceof Citizen) {
-                    Citizen citizen = (Citizen) target;
-                    if (citizen.getState() != CitizenState.DECEASED) return false;
-                } else {
+                if (target instanceof ResidentialBuilding) {
                     ResidentialBuilding building = (ResidentialBuilding) target;
                     if (building.getStructuralIntegrity() != 0) return false;
+                } else {
+                    Citizen citizen = (Citizen) target;
+                    if (citizen.getState() != CitizenState.DECEASED) return false;
                 }
             }
         }

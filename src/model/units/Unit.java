@@ -115,6 +115,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
                             for (Citizen citizen : evacuator.getPassengers()) {
                                 worldListener.assignAddress(citizen, 0, 0);
                             }
+                            cycleStep();
                         }
                     }
                 }
