@@ -45,6 +45,7 @@ public class WorldBlock extends JButton {
 
     private void requestLayout() {
         Icon icon = null;
+        // TODO: Stack icons in one image
         for (Simulatable simulatable : simulatables) {
             if (simulatable instanceof Citizen) {
                 icon = new GameIcon("citizen.png").resize(GameIcon.Size.WORLD_BLOCK);

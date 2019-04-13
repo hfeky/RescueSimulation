@@ -40,7 +40,6 @@ public class GameView extends JFrame {
         initInfoPanel();
         initGridPanel();
         initUnitsPanel();
-        initWorldMap();
 
         setVisible(true);
     }
@@ -136,10 +135,6 @@ public class GameView extends JFrame {
         unitsPanel.add(treatingUnits);
 
         add(unitsPanel, BorderLayout.EAST);
-    }
-
-    private void initWorldMap() {
-
     }
 
     public void addRescuableOnWorldMap(Rescuable rescuable) {
