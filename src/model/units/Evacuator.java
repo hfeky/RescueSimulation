@@ -34,4 +34,14 @@ public class Evacuator extends PoliceUnit {
         super.respond(r);
         setDistanceToBase(getLocation().getX() + getLocation().getY());
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(super.toString());
+        sb.append("\nPassengers Amount: ").append(getPassengers().size());
+        for (int i = 1; i <= getPassengers().size(); i++) {
+            sb.append("\n\nPassenger ").append(i).append(":\n").append(getPassengers().get(i - 1).toString());
+        }
+        return sb.toString();
+    }
 }

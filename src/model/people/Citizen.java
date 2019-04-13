@@ -123,4 +123,17 @@ public class Citizen implements Simulatable, Rescuable {
     public void setWorldListener(WorldListener worldListener) {
         this.worldListener = worldListener;
     }
+
+    @Override
+    public String toString() {
+        return "Location: (" + location.getX() + "," + location.getY() + ")" +
+                "\nName: " + name +
+                "\nAge: " + age +
+                "\nNational ID: " + nationalID +
+                "\nHP: " + hp +
+                "\nBlood Loss: " + bloodLoss +
+                "\nToxicity: " + toxicity +
+                "\nState: " + state +
+                "\nCurrent Disaster: " + (disaster != null ? disaster.getClass().getSimpleName() : "None");
+    }
 }

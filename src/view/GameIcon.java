@@ -6,7 +6,7 @@ import java.awt.*;
 public class GameIcon extends ImageIcon {
 
     public enum Size {
-        CITIZEN, BUILDING, UNIT
+        WORLD_BLOCK, UNIT_BLOCK
     }
 
     public GameIcon(String filename) {
@@ -14,18 +14,18 @@ public class GameIcon extends ImageIcon {
     }
 
     public Icon resize(Size imageSize) {
-        int resizedWidth = 50;
-        int resizedHeight = 50;
+        int resizedWidth;
+        int resizedHeight;
         switch (imageSize) {
-            case CITIZEN:
+            case WORLD_BLOCK:
+                resizedWidth = 70;
+                resizedHeight = 70;
+                break;
+            case UNIT_BLOCK:
                 resizedWidth = 50;
                 resizedHeight = 50;
                 break;
-            case BUILDING:
-                resizedWidth = 50;
-                resizedHeight = 50;
-                break;
-            case UNIT:
+            default:
                 resizedWidth = 50;
                 resizedHeight = 50;
                 break;

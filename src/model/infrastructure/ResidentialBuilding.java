@@ -106,4 +106,19 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     public void setEmergencyService(SOSListener sosListener) {
         this.emergencyService = sosListener;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Location: (" + location.getX() + "," + location.getY() + ")" +
+                "\nOccupants Amount: " + occupants.size() +
+                "\nStructural Integrity: " + structuralIntegrity +
+                "\nFire Damage: " + fireDamage +
+                "\nGas Level: " + gasLevel +
+                "\nFoundation Damage: " + foundationDamage +
+                "\nCurrent Disaster: " + (disaster != null ? disaster.getClass().getSimpleName() : "None"));
+        for (int i = 1; i <= occupants.size(); i++) {
+            sb.append("\n\nCitizen ").append(i).append(":\n").append(occupants.get(i - 1).toString());
+        }
+        return sb.toString();
+    }
 }

@@ -2,6 +2,7 @@ package view;
 
 import controller.CommandCenter;
 import exceptions.DisasterException;
+import model.units.Unit;
 import simulation.Rescuable;
 import simulation.Simulatable;
 import simulation.Simulator;
@@ -18,6 +19,7 @@ public class GameView extends JFrame {
     private JPanel availableUnits, respondingUnits, treatingUnits;
     private JLabel cycleInfo;
     private JTextArea blockInfo;
+    private JTextArea logInfo;
     private ArrayList<WorldBlock> gridBlocks = new ArrayList<>();
 
     private static final int PADDING = 10;
@@ -45,12 +47,14 @@ public class GameView extends JFrame {
 
     private void initInfoPanel() {
         infoPanel = new JPanel();
-        infoPanel.setPreferredSize(new Dimension(200, getHeight()));
+        infoPanel.setPreferredSize(new Dimension(250, getHeight()));
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
         infoPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, 0));
 
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new FlowLayout());
         JButton nextCycle = new JButton("Next Cycle");
-        nextCycle.setPreferredSize(new Dimension(200, 50));
+        nextCycle.setPreferredSize(new Dimension(250 - PADDING, 50));
         nextCycle.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -64,18 +68,29 @@ public class GameView extends JFrame {
                 }
             }
         });
+        controlPanel.add(nextCycle);
 
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         cycleInfo = new JLabel("<html>Current Cycle: 0<br>Casualties: 0</html>");
         cycleInfo.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
+        statusPanel.add(cycleInfo);
 
         blockInfo = new JTextArea();
-        blockInfo.setPreferredSize(new Dimension(200, getHeight()));
         blockInfo.setEditable(false);
         blockInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        blockInfo.setBorder(BorderFactory.createTitledBorder("Block Info"));
 
-        infoPanel.add(nextCycle);
-        infoPanel.add(cycleInfo);
+        logInfo = new JTextArea();
+        logInfo.setEditable(false);
+        logInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        logInfo.setBorder(BorderFactory.createTitledBorder("Game Log"));
+
+        infoPanel.add(controlPanel);
+        infoPanel.add(statusPanel);
         infoPanel.add(blockInfo);
+        infoPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
+        infoPanel.add(logInfo);
         add(infoPanel, BorderLayout.WEST);
     }
 
@@ -85,7 +100,7 @@ public class GameView extends JFrame {
         gridPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                WorldBlock worldBlock = new WorldBlock();
+                WorldBlock worldBlock = new WorldBlock(blockInfo);
                 gridPanel.add(worldBlock);
                 gridBlocks.add(worldBlock);
             }
@@ -102,16 +117,10 @@ public class GameView extends JFrame {
         availableUnits = new JPanel();
         availableUnits.setLayout(new GridLayout(3, 2));
         availableUnits.setBorder(BorderFactory.createTitledBorder("Available Units"));
-        JButton button1 = new JButton(new GameIcon("ambulance.png").resize(GameIcon.Size.UNIT));
-        JButton button2 = new JButton(new GameIcon("disease_control.png").resize(GameIcon.Size.UNIT));
-        JButton button3 = new JButton(new GameIcon("fire_truck.png").resize(GameIcon.Size.UNIT));
-        JButton button4 = new JButton(new GameIcon("gas_control.png").resize(GameIcon.Size.UNIT));
-        JButton button5 = new JButton(new GameIcon("evacuator.png").resize(GameIcon.Size.UNIT));
-        availableUnits.add(button1);
-        availableUnits.add(button2);
-        availableUnits.add(button3);
-        availableUnits.add(button4);
-        availableUnits.add(button5);
+        for (Unit unit : engine.getEmergencyUnits()) {
+            UnitBlock unitBlock = new UnitBlock(unit, blockInfo);
+            availableUnits.add(unitBlock);
+        }
         unitsPanel.add(availableUnits);
         unitsPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
 
