@@ -178,6 +178,11 @@ public class Simulator implements WorldListener {
         return casualties;
     }
 
+    // Gets current cycle
+    public int getCurrentCycle() {
+        return currentCycle;
+    }
+
     public void nextCycle() throws DisasterException {
         currentCycle++;
         for (int i = 0; i < plannedDisasters.size(); ) {

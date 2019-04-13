@@ -1,7 +1,16 @@
 package view;
 
+import controller.CommandCenter;
+import exceptions.DisasterException;
+import simulation.Rescuable;
+import simulation.Simulatable;
+import simulation.Simulator;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class GameView extends JFrame {
 
@@ -9,10 +18,16 @@ public class GameView extends JFrame {
     private JPanel availableUnits, respondingUnits, treatingUnits;
     private JLabel cycleInfo;
     private JTextArea blockInfo;
+    private ArrayList<WorldBlock> gridBlocks = new ArrayList<>();
 
     private static final int PADDING = 10;
 
-    public GameView() {
+    private CommandCenter commandCenter;
+    private Simulator engine;
+
+    public GameView(CommandCenter commandCenter, Simulator engine) {
+        this.commandCenter = commandCenter;
+        this.engine = engine;
         setTitle("Rescue Simulation");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -23,6 +38,7 @@ public class GameView extends JFrame {
         initInfoPanel();
         initGridPanel();
         initUnitsPanel();
+        initWorldMap();
 
         setVisible(true);
     }
@@ -35,8 +51,21 @@ public class GameView extends JFrame {
 
         JButton nextCycle = new JButton("Next Cycle");
         nextCycle.setPreferredSize(new Dimension(200, 50));
+        nextCycle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!engine.checkGameOver()) {
+                    try {
+                        engine.nextCycle();
+                        setCycleInfo(engine.getCurrentCycle(), engine.calculateCasualties());
+                    } catch (DisasterException de) {
+                        de.printStackTrace();
+                    }
+                }
+            }
+        });
 
-        cycleInfo = new JLabel("<html>Current Cycle: 1<br>Casualties: 0</html>");
+        cycleInfo = new JLabel("<html>Current Cycle: 0<br>Casualties: 0</html>");
         cycleInfo.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
 
         blockInfo = new JTextArea();
@@ -56,8 +85,9 @@ public class GameView extends JFrame {
         gridPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                JButton jButton = new JButton();
-                gridPanel.add(jButton);
+                WorldBlock worldBlock = new WorldBlock();
+                gridPanel.add(worldBlock);
+                gridBlocks.add(worldBlock);
             }
         }
         add(gridPanel, BorderLayout.CENTER);
@@ -97,6 +127,15 @@ public class GameView extends JFrame {
         unitsPanel.add(treatingUnits);
 
         add(unitsPanel, BorderLayout.EAST);
+    }
+
+    private void initWorldMap() {
+
+    }
+
+    public void addRescuableOnWorldMap(Rescuable rescuable) {
+        WorldBlock worldBlock = gridBlocks.get(rescuable.getLocation().getY() * 10 + rescuable.getLocation().getX());
+        worldBlock.addSimulatable((Simulatable) rescuable);
     }
 
     public void setCycleInfo(int cycleNumber, int casualties) {

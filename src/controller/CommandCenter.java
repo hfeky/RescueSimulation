@@ -8,11 +8,9 @@ import simulation.Rescuable;
 import simulation.Simulator;
 import view.GameView;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class CommandCenter implements SOSListener, ActionListener {
+public class CommandCenter implements SOSListener {
 
     private Simulator engine;
     private ArrayList<ResidentialBuilding> visibleBuildings = new ArrayList<>();
@@ -22,7 +20,7 @@ public class CommandCenter implements SOSListener, ActionListener {
 
     public CommandCenter() throws Exception {
         engine = new Simulator(this);
-        gameView = new GameView();
+        gameView = new GameView(this, engine);
     }
 
     @Override
@@ -32,11 +30,19 @@ public class CommandCenter implements SOSListener, ActionListener {
         } else if (r instanceof ResidentialBuilding) {
             visibleBuildings.add((ResidentialBuilding) r);
         }
+        gameView.addRescuableOnWorldMap(r);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    public ArrayList<Citizen> getVisibleCitizens() {
+        return visibleCitizens;
+    }
 
+    public ArrayList<ResidentialBuilding> getVisibleBuildings() {
+        return visibleBuildings;
+    }
+
+    public ArrayList<Unit> getEmergencyUnits() {
+        return emergencyUnits;
     }
 
     public static void main(String[] args) throws Exception {
