@@ -8,6 +8,7 @@ import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.people.CitizenState;
 import model.units.*;
+import view.GameView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,7 +18,6 @@ public class Simulator implements WorldListener {
 
     private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
     private ArrayList<Citizen> citizens = new ArrayList<>();
-
     private ArrayList<Unit> emergencyUnits = new ArrayList<>();
     private ArrayList<Disaster> plannedDisasters = new ArrayList<>();
     private ArrayList<Disaster> executedDisasters = new ArrayList<>();
@@ -25,6 +25,8 @@ public class Simulator implements WorldListener {
     private Address[][] world = new Address[10][10];
     private int currentCycle;
     private SOSListener emergencyService;
+
+    private GameView gameView;
 
     public Simulator(SOSListener sosListener) throws Exception {
         for (int i = 0; i < world.length; i++) {
@@ -134,12 +136,24 @@ public class Simulator implements WorldListener {
         if (0 <= x && x <= 10 && 0 <= y && y <= 10) {
             if (sim instanceof Citizen) {
                 Citizen citizen = (Citizen) sim;
+                gameView.removeSimulatableOnWorldMap(citizen);
                 citizen.setLocation(world[x][y]);
+                gameView.addSimulatableOnWorldMap(citizen);
             } else if (sim instanceof Unit) {
                 Unit unit = (Unit) sim;
+                gameView.removeSimulatableOnWorldMap(unit);
                 unit.setLocation(world[x][y]);
+                gameView.addSimulatableOnWorldMap(unit);
             }
         }
+    }
+
+    public ArrayList<ResidentialBuilding> getBuildings() {
+        return buildings;
+    }
+
+    public ArrayList<Citizen> getCitizens() {
+        return citizens;
     }
 
     public ArrayList<Unit> getEmergencyUnits() {
@@ -185,6 +199,7 @@ public class Simulator implements WorldListener {
 
     public void nextCycle() throws DisasterException {
         currentCycle++;
+        StringBuilder cycleLog = new StringBuilder();
         for (int i = 0; i < plannedDisasters.size(); ) {
             Disaster disaster = plannedDisasters.get(i);
             if (disaster.getStartCycle() == currentCycle) {
@@ -218,14 +233,23 @@ public class Simulator implements WorldListener {
                         }
                         newDisaster.strike();
                         executedDisasters.add(newDisaster);
+                        cycleLog.append(newDisaster.getClass().getSimpleName()).append(" occurred on ResidentialBuilding at (")
+                                .append(building.getLocation().getX()).append(",").append(building.getLocation().getY()).append(").\n");
                     }
                 } else {
+                    Citizen citizen = (Citizen) disaster.getTarget();
                     disaster.strike();
                     executedDisasters.add(disaster);
+                    cycleLog.append(disaster.getClass().getSimpleName()).append(" occurred on Citizen at (")
+                            .append(citizen.getLocation().getX()).append(",").append(citizen.getLocation().getY()).append(").\n");
                 }
             } else {
                 i++;
             }
+        }
+        if (cycleLog.length() > 0) {
+            cycleLog.insert(0, "Cycle " + currentCycle + ":\n");
+            gameView.addToLog(cycleLog.toString());
         }
         for (ResidentialBuilding building : buildings) {
             if (building.getFireDamage() == 100) {
@@ -252,5 +276,10 @@ public class Simulator implements WorldListener {
         for (Citizen citizen : citizens) {
             citizen.cycleStep();
         }
+        gameView.invalidateUnitsPanel();
+    }
+
+    public void setGameView(GameView gameView) {
+        this.gameView = gameView;
     }
 }

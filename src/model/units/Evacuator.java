@@ -38,7 +38,7 @@ public class Evacuator extends PoliceUnit {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(super.toString());
-        sb.append("\nPassengers Amount: ").append(getPassengers().size());
+        sb.append("\nPassengers: ").append(getPassengers().size()).append("/").append(getMaxCapacity());
         for (int i = 1; i <= getPassengers().size(); i++) {
             sb.append("\n\nPassenger ").append(i).append(":\n").append(getPassengers().get(i - 1).toString());
         }

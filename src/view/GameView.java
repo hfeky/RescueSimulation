@@ -2,7 +2,10 @@ package view;
 
 import controller.CommandCenter;
 import exceptions.DisasterException;
+import model.infrastructure.ResidentialBuilding;
+import model.people.Citizen;
 import model.units.Unit;
+import model.units.UnitState;
 import simulation.Rescuable;
 import simulation.Simulatable;
 import simulation.Simulator;
@@ -11,7 +14,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 public class GameView extends JFrame {
 
@@ -20,7 +22,6 @@ public class GameView extends JFrame {
     private JLabel cycleInfo;
     private JTextArea blockInfo;
     private JTextArea logInfo;
-    private ArrayList<WorldBlock> gridBlocks = new ArrayList<>();
 
     private static final int PADDING = 10;
 
@@ -34,62 +35,40 @@ public class GameView extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setBounds(new Rectangle(new Dimension(800, 600)));
+        setBounds(new Rectangle(new Dimension(1500, 900)));
         setLocation((screenSize.width - getSize().width) / 2, (screenSize.height - getSize().height) / 2);
 
         initInfoPanel();
         initGridPanel();
         initUnitsPanel();
+        initWorldMap();
 
         setVisible(true);
     }
 
     private void initInfoPanel() {
         infoPanel = new JPanel();
-        infoPanel.setPreferredSize(new Dimension(250, getHeight()));
+        infoPanel.setPreferredSize(new Dimension(400, getHeight()));
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
         infoPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, 0));
-
-        JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new FlowLayout());
-        JButton nextCycle = new JButton("Next Cycle");
-        nextCycle.setPreferredSize(new Dimension(250 - PADDING, 50));
-        nextCycle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!engine.checkGameOver()) {
-                    try {
-                        engine.nextCycle();
-                        setCycleInfo(engine.getCurrentCycle(), engine.calculateCasualties());
-                    } catch (DisasterException de) {
-                        de.printStackTrace();
-                    }
-                }
-            }
-        });
-        controlPanel.add(nextCycle);
-
-        JPanel statusPanel = new JPanel();
-        statusPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        cycleInfo = new JLabel("<html>Current Cycle: 0<br>Casualties: 0</html>");
-        cycleInfo.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0));
-        statusPanel.add(cycleInfo);
 
         blockInfo = new JTextArea();
         blockInfo.setEditable(false);
         blockInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        blockInfo.setBorder(BorderFactory.createTitledBorder("Block Info"));
+        JScrollPane blockScrollPane = new JScrollPane(blockInfo);
+        blockScrollPane.setPreferredSize(new Dimension(getWidth(), getHeight()));
+        blockScrollPane.setBorder(BorderFactory.createTitledBorder("Block Info"));
 
         logInfo = new JTextArea();
         logInfo.setEditable(false);
         logInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        logInfo.setBorder(BorderFactory.createTitledBorder("Game Log"));
+        JScrollPane logScrollPane = new JScrollPane(logInfo);
+        logScrollPane.setPreferredSize(new Dimension(getWidth(), 300));
+        logScrollPane.setBorder(BorderFactory.createTitledBorder("Game Log"));
 
-        infoPanel.add(controlPanel);
-        infoPanel.add(statusPanel);
-        infoPanel.add(blockInfo);
+        infoPanel.add(blockScrollPane);
         infoPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
-        infoPanel.add(logInfo);
+        infoPanel.add(logScrollPane);
         add(infoPanel, BorderLayout.WEST);
     }
 
@@ -101,7 +80,6 @@ public class GameView extends JFrame {
             for (int j = 0; j < 10; j++) {
                 WorldBlock worldBlock = new WorldBlock(blockInfo);
                 gridPanel.add(worldBlock);
-                gridBlocks.add(worldBlock);
             }
         }
         add(gridPanel, BorderLayout.CENTER);
@@ -113,8 +91,39 @@ public class GameView extends JFrame {
         unitsPanel.setLayout(new BoxLayout(unitsPanel, BoxLayout.PAGE_AXIS));
         unitsPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, 0, PADDING, PADDING));
 
+        JPanel statusPanel = new JPanel();
+        statusPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        cycleInfo = new JLabel("<html>Current Cycle: 0<br>Casualties: 0</html>");
+        statusPanel.add(cycleInfo);
+        unitsPanel.add(statusPanel);
+        unitsPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.setLayout(new FlowLayout());
+        JButton nextCycle = new JButton("Next Cycle");
+        nextCycle.setPreferredSize(new Dimension(180, 50));
+        nextCycle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!engine.checkGameOver()) {
+                    try {
+                        engine.nextCycle();
+                        setCycleInfo(engine.getCurrentCycle(), engine.calculateCasualties());
+                    } catch (DisasterException de) {
+                        de.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(GameView.this, "Game Over!");
+                }
+            }
+        });
+        controlPanel.add(nextCycle);
+        unitsPanel.add(controlPanel);
+        unitsPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
+
         availableUnits = new JPanel();
         availableUnits.setLayout(new GridLayout(3, 2));
+        availableUnits.setPreferredSize(new Dimension(getWidth(), 300));
         availableUnits.setBorder(BorderFactory.createTitledBorder("Available Units"));
         for (Unit unit : engine.getEmergencyUnits()) {
             UnitBlock unitBlock = new UnitBlock(unit, blockInfo);
@@ -125,24 +134,130 @@ public class GameView extends JFrame {
 
         respondingUnits = new JPanel();
         respondingUnits.setLayout(new GridLayout(3, 2));
+        respondingUnits.setPreferredSize(new Dimension(getWidth(), 300));
         respondingUnits.setBorder(BorderFactory.createTitledBorder("Responding Units"));
         unitsPanel.add(respondingUnits);
         unitsPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
 
         treatingUnits = new JPanel();
         treatingUnits.setLayout(new GridLayout(3, 2));
+        treatingUnits.setPreferredSize(new Dimension(getWidth(), 300));
         treatingUnits.setBorder(BorderFactory.createTitledBorder("Treating Units"));
         unitsPanel.add(treatingUnits);
 
         add(unitsPanel, BorderLayout.EAST);
     }
 
-    public void addRescuableOnWorldMap(Rescuable rescuable) {
-        WorldBlock worldBlock = gridBlocks.get(rescuable.getLocation().getY() * 10 + rescuable.getLocation().getX());
-        worldBlock.addSimulatable((Simulatable) rescuable);
+    private void initWorldMap() {
+        for (ResidentialBuilding building : engine.getBuildings()) {
+            addSimulatableOnWorldMap(building);
+        }
+        for (Citizen citizen : engine.getCitizens()) {
+            addSimulatableOnWorldMap(citizen);
+        }
+        for (Unit unit : engine.getEmergencyUnits()) {
+            addSimulatableOnWorldMap(unit);
+        }
+    }
+
+    public void removeSimulatableOnWorldMap(Simulatable simulatable) {
+        WorldBlock worldBlock;
+        if (simulatable instanceof Rescuable) {
+            worldBlock = (WorldBlock) gridPanel.getComponent(((Rescuable) simulatable).getLocation().getY() * 10 + ((Rescuable) simulatable).getLocation().getX());
+        } else {
+            worldBlock = (WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 + ((Unit) simulatable).getLocation().getX());
+        }
+        worldBlock.removeSimulatable(simulatable);
+    }
+
+    public void addSimulatableOnWorldMap(Simulatable simulatable) {
+        WorldBlock worldBlock;
+        if (simulatable instanceof Rescuable) {
+            worldBlock = (WorldBlock) gridPanel.getComponent(((Rescuable) simulatable).getLocation().getY() * 10 + ((Rescuable) simulatable).getLocation().getX());
+        } else {
+            worldBlock = (WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 + ((Unit) simulatable).getLocation().getX());
+        }
+        worldBlock.addSimulatable(simulatable);
     }
 
     public void setCycleInfo(int cycleNumber, int casualties) {
         cycleInfo.setText("<html>Current Cycle: " + cycleNumber + "<br>Casualties: " + casualties + "</html>");
+    }
+
+    public void addToLog(String text) {
+        logInfo.setText((logInfo.getText() + "\n\n" + text).trim());
+    }
+
+    public void deselectAllUnits() {
+        for (int i = 0; i < getAvailableUnits().getComponentCount(); i++) {
+            UnitBlock unitBlock = (UnitBlock) getAvailableUnits().getComponent(i);
+            unitBlock.setSelected(false);
+        }
+        for (int i = 0; i < getRespondingUnits().getComponentCount(); i++) {
+            UnitBlock unitBlock = (UnitBlock) getRespondingUnits().getComponent(i);
+            unitBlock.setSelected(false);
+        }
+        for (int i = 0; i < getTreatingUnits().getComponentCount(); i++) {
+            UnitBlock unitBlock = (UnitBlock) getTreatingUnits().getComponent(i);
+            unitBlock.setSelected(false);
+        }
+    }
+
+    public void invalidateUnitsPanel() {
+        for (int i = 0; i < getAvailableUnits().getComponentCount(); ) {
+            UnitBlock unitBlock = (UnitBlock) getAvailableUnits().getComponent(i);
+            if (unitBlock.getUnit().getState() == UnitState.RESPONDING) {
+                getAvailableUnits().remove(unitBlock);
+                getRespondingUnits().add(unitBlock);
+            } else if (unitBlock.getUnit().getState() == UnitState.TREATING) {
+                getAvailableUnits().remove(unitBlock);
+                getTreatingUnits().add(unitBlock);
+            } else {
+                i++;
+            }
+        }
+        for (int i = 0; i < getRespondingUnits().getComponentCount(); ) {
+            UnitBlock unitBlock = (UnitBlock) getRespondingUnits().getComponent(i);
+            if (unitBlock.getUnit().getState() == UnitState.IDLE) {
+                getRespondingUnits().remove(unitBlock);
+                getAvailableUnits().add(unitBlock);
+            } else if (unitBlock.getUnit().getState() == UnitState.TREATING) {
+                getRespondingUnits().remove(unitBlock);
+                getTreatingUnits().add(unitBlock);
+            } else {
+                i++;
+            }
+        }
+        for (int i = 0; i < getTreatingUnits().getComponentCount(); ) {
+            UnitBlock unitBlock = (UnitBlock) getTreatingUnits().getComponent(i);
+            if (unitBlock.getUnit().getState() == UnitState.IDLE) {
+                getTreatingUnits().remove(unitBlock);
+                getAvailableUnits().add(unitBlock);
+            } else if (unitBlock.getUnit().getState() == UnitState.RESPONDING) {
+                getTreatingUnits().remove(unitBlock);
+                getRespondingUnits().add(unitBlock);
+            } else {
+                i++;
+            }
+        }
+        getAvailableUnits().validate();
+        getRespondingUnits().validate();
+        getTreatingUnits().validate();
+    }
+
+    public JPanel getGridPanel() {
+        return gridPanel;
+    }
+
+    public JPanel getAvailableUnits() {
+        return availableUnits;
+    }
+
+    public JPanel getRespondingUnits() {
+        return respondingUnits;
+    }
+
+    public JPanel getTreatingUnits() {
+        return treatingUnits;
     }
 }

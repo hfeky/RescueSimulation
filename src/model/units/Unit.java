@@ -191,7 +191,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
     @Override
     public String toString() {
         return "Location: (" + location.getX() + "," + location.getY() + ")" +
-                "\nID: " + unitID +
+                "\nUnit ID: " + unitID +
                 "\nType: " + getClass().getSimpleName() +
                 "\nSteps Per Cycle: " + stepsPerCycle +
                 "\nTarget: " + (target != null ? target.getClass().getSimpleName() +

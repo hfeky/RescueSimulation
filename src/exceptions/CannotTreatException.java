@@ -5,12 +5,11 @@ import simulation.Rescuable;
 
 public class CannotTreatException extends UnitException {
 
-	public CannotTreatException(Unit unit, Rescuable target) {
-		super(unit, target, "The " + target.getClass().getSimpleName() + " is already safe.");
-	}
+    public CannotTreatException(Unit unit, Rescuable target) {
+        super(unit, target, "The " + target.getClass().getSimpleName() + " is already safe.");
+    }
 
-	public CannotTreatException(Unit unit, Rescuable target, String message) {
-		super(unit, target, message);
-	}
-
+    public CannotTreatException(Unit unit, Rescuable target, String message) {
+        super(unit, target, message);
+    }
 }

@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class UnitBlock extends JButton {
+public class UnitBlock extends JToggleButton {
 
     private Unit unit;
 
