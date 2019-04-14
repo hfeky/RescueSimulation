@@ -277,6 +277,17 @@ public class Simulator implements WorldListener {
             citizen.cycleStep();
         }
         gameView.invalidateUnitsPanel();
+        StringBuilder activeDisasters = new StringBuilder();
+        for (Disaster disaster : executedDisasters) {
+            if (disaster.isActive()) {
+                Rescuable rescuable = disaster.getTarget();
+                activeDisasters.append(disaster.getClass().getSimpleName()).append(" on ")
+                        .append(rescuable.getClass().getSimpleName()).append(" at (")
+                        .append(rescuable.getLocation().getX()).append(",")
+                        .append(rescuable.getLocation().getY()).append(")\n");
+            }
+        }
+        gameView.setActiveDisasters(activeDisasters.toString().trim());
     }
 
     public void setGameView(GameView gameView) {

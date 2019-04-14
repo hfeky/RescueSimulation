@@ -11,18 +11,20 @@ public class UnitBlock extends JToggleButton {
 
     private Unit unit;
 
-    public UnitBlock(Unit unit, JTextArea blockInfo) {
+    public UnitBlock(Unit unit) {
         this.unit = unit;
         requestLayout();
         addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 UnitBlock.this.setBackground(Color.GREEN);
-                blockInfo.setText(unit.toString());
+                String blockInfo = unit.toString();
+                if (!blockInfo.isEmpty()) {
+                    setToolTipText("<html>" + blockInfo.replaceAll("\n", "<br>") + "</html>");
+                }
             }
 
             public void mouseExited(MouseEvent e) {
                 UnitBlock.this.setBackground(UIManager.getColor("control"));
-                blockInfo.setText(null);
             }
         });
     }

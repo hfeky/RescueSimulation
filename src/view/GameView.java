@@ -20,16 +20,14 @@ public class GameView extends JFrame {
     private JPanel infoPanel, gridPanel, unitsPanel;
     private JPanel availableUnits, respondingUnits, treatingUnits;
     private JLabel cycleInfo;
-    private JTextArea blockInfo;
+    private JTextArea disastersInfo;
     private JTextArea logInfo;
 
     private static final int PADDING = 10;
 
-    private CommandCenter commandCenter;
     private Simulator engine;
 
-    public GameView(CommandCenter commandCenter, Simulator engine) {
-        this.commandCenter = commandCenter;
+    public GameView(Simulator engine) {
         this.engine = engine;
         setTitle("Rescue Simulation");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -52,18 +50,18 @@ public class GameView extends JFrame {
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
         infoPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, 0));
 
-        blockInfo = new JTextArea();
-        blockInfo.setEditable(false);
-        blockInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        JScrollPane blockScrollPane = new JScrollPane(blockInfo);
-        blockScrollPane.setPreferredSize(new Dimension(getWidth(), getHeight()));
-        blockScrollPane.setBorder(BorderFactory.createTitledBorder("Block Info"));
+        disastersInfo = new JTextArea();
+        disastersInfo.setEditable(false);
+        disastersInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+        JScrollPane blockScrollPane = new JScrollPane(disastersInfo);
+        blockScrollPane.setPreferredSize(new Dimension(getWidth(), getHeight() / 2));
+        blockScrollPane.setBorder(BorderFactory.createTitledBorder("Active Disasters"));
 
         logInfo = new JTextArea();
         logInfo.setEditable(false);
         logInfo.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         JScrollPane logScrollPane = new JScrollPane(logInfo);
-        logScrollPane.setPreferredSize(new Dimension(getWidth(), 300));
+        logScrollPane.setPreferredSize(new Dimension(getWidth(), getHeight() / 2));
         logScrollPane.setBorder(BorderFactory.createTitledBorder("Game Log"));
 
         infoPanel.add(blockScrollPane);
@@ -78,7 +76,7 @@ public class GameView extends JFrame {
         gridPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
         for (int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
-                WorldBlock worldBlock = new WorldBlock(blockInfo);
+                WorldBlock worldBlock = new WorldBlock();
                 gridPanel.add(worldBlock);
             }
         }
@@ -126,7 +124,7 @@ public class GameView extends JFrame {
         availableUnits.setPreferredSize(new Dimension(getWidth(), 300));
         availableUnits.setBorder(BorderFactory.createTitledBorder("Available Units"));
         for (Unit unit : engine.getEmergencyUnits()) {
-            UnitBlock unitBlock = new UnitBlock(unit, blockInfo);
+            UnitBlock unitBlock = new UnitBlock(unit);
             availableUnits.add(unitBlock);
         }
         unitsPanel.add(availableUnits);
@@ -182,6 +180,10 @@ public class GameView extends JFrame {
 
     public void setCycleInfo(int cycleNumber, int casualties) {
         cycleInfo.setText("<html>Current Cycle: " + cycleNumber + "<br>Casualties: " + casualties + "</html>");
+    }
+
+    public void setActiveDisasters(String activeDisasters) {
+        disastersInfo.setText(activeDisasters);
     }
 
     public void addToLog(String text) {

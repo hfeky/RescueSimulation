@@ -18,29 +18,24 @@ public class WorldBlock extends JButton {
     private Rescuable rescuable;
     private ArrayList<Unit> units = new ArrayList<>();
 
-    public WorldBlock(JTextArea blockInfo) {
+    public WorldBlock() {
         addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 WorldBlock.this.setBackground(Color.GREEN);
+                StringBuilder blockInfo= new StringBuilder();
                 if (rescuable != null) {
-                    if (units.size() == 0) {
-                        blockInfo.setText(rescuable.toString());
-                    } else {
-                        blockInfo.setText((rescuable instanceof ResidentialBuilding ? "Building:\n" : "Citizen:\n") + rescuable.toString());
-                    }
+                    blockInfo.append("<b>").append(rescuable.getClass().getSimpleName()).append(":</b>\n").append(rescuable.toString());
                 }
-                if (units.size() == 1) {
-                    blockInfo.setText((blockInfo.getText() + "\n\nUnit:\n" + units.get(0).toString()).trim());
-                } else {
-                    for (int i = 1; i <= units.size(); i++) {
-                        blockInfo.setText((blockInfo.getText() + "\n\nUnit " + i + ":\n" + units.get(i - 1).toString()).trim());
-                    }
+                for (int i = 1; i <= units.size(); i++) {
+                    blockInfo.append("\n\n").append(units.get(i - 1).toString());
+                }
+                if (blockInfo.length() > 0) {
+                    setToolTipText("<html>" + blockInfo.toString().trim().replaceAll("\n", "<br>") + "</html>");
                 }
             }
 
             public void mouseExited(MouseEvent e) {
                 WorldBlock.this.setBackground(UIManager.getColor("control"));
-                blockInfo.setText(null);
             }
         });
     }

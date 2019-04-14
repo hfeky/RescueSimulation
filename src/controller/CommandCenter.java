@@ -26,42 +26,12 @@ public class CommandCenter implements SOSListener {
     private ArrayList<Unit> emergencyUnits = new ArrayList<>();
     private GameView gameView;
 
+    private UnitBlock selectedUnit;
+
     public CommandCenter() throws Exception {
         engine = new Simulator(this);
-        gameView = new GameView(this, engine);
+        gameView = new GameView(engine);
         engine.setGameView(gameView);
-    }
-
-    @Override
-    public void receiveSOSCall(Rescuable r) {
-        if (r instanceof Citizen) {
-            visibleCitizens.add((Citizen) r);
-        } else if (r instanceof ResidentialBuilding) {
-            visibleBuildings.add((ResidentialBuilding) r);
-        }
-    }
-
-    public ArrayList<Citizen> getVisibleCitizens() {
-        return visibleCitizens;
-    }
-
-    public ArrayList<ResidentialBuilding> getVisibleBuildings() {
-        return visibleBuildings;
-    }
-
-    public ArrayList<Unit> getEmergencyUnits() {
-        return emergencyUnits;
-    }
-
-    public GameView getGameView() {
-        return gameView;
-    }
-
-    private static UnitBlock selectedUnit;
-
-    public static void main(String[] args) throws Exception {
-        CommandCenter commandCenter = new CommandCenter();
-        GameView gameView = commandCenter.getGameView();
 
         for (int i = 0; i < gameView.getAvailableUnits().getComponentCount(); i++) {
             UnitBlock unitBlock = (UnitBlock) gameView.getAvailableUnits().getComponent(i);
@@ -103,5 +73,34 @@ public class CommandCenter implements SOSListener {
                 }
             });
         }
+    }
+
+    @Override
+    public void receiveSOSCall(Rescuable r) {
+        if (r instanceof Citizen) {
+            visibleCitizens.add((Citizen) r);
+        } else if (r instanceof ResidentialBuilding) {
+            visibleBuildings.add((ResidentialBuilding) r);
+        }
+    }
+
+    public ArrayList<Citizen> getVisibleCitizens() {
+        return visibleCitizens;
+    }
+
+    public ArrayList<ResidentialBuilding> getVisibleBuildings() {
+        return visibleBuildings;
+    }
+
+    public ArrayList<Unit> getEmergencyUnits() {
+        return emergencyUnits;
+    }
+
+    public GameView getGameView() {
+        return gameView;
+    }
+
+    public static void main(String[] args) throws Exception {
+        new CommandCenter();
     }
 }
