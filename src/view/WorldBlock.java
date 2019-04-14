@@ -20,9 +20,10 @@ public class WorldBlock extends JButton {
 
     public WorldBlock() {
         addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseEntered(MouseEvent e) {
                 WorldBlock.this.setBackground(Color.GREEN);
-                StringBuilder blockInfo= new StringBuilder();
+                StringBuilder blockInfo = new StringBuilder();
                 if (rescuable != null) {
                     blockInfo.append("<b>").append(rescuable.getClass().getSimpleName()).append(":</b>\n").append(rescuable.toString());
                 }
@@ -34,6 +35,7 @@ public class WorldBlock extends JButton {
                 }
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
                 WorldBlock.this.setBackground(UIManager.getColor("control"));
             }

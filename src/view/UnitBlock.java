@@ -15,6 +15,7 @@ public class UnitBlock extends JToggleButton {
         this.unit = unit;
         requestLayout();
         addMouseListener(new MouseAdapter() {
+            @Override
             public void mouseEntered(MouseEvent e) {
                 UnitBlock.this.setBackground(Color.GREEN);
                 String blockInfo = unit.toString();
@@ -23,6 +24,7 @@ public class UnitBlock extends JToggleButton {
                 }
             }
 
+            @Override
             public void mouseExited(MouseEvent e) {
                 UnitBlock.this.setBackground(UIManager.getColor("control"));
             }

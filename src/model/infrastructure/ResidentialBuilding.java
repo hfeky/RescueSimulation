@@ -117,7 +117,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
                 "\nFoundation Damage: " + foundationDamage +
                 "\nCurrent Disaster: " + (disaster != null ? disaster.getClass().getSimpleName() : "None"));
         for (int i = 1; i <= occupants.size(); i++) {
-            sb.append("\n\n<b>Citizen ").append(i).append(":</b>\n").append(occupants.get(i - 1).toString());
+            sb.append("\n\n<b>Occupant ").append(i).append(":</b>\n").append(occupants.get(i - 1).toString());
         }
         return sb.toString();
     }
