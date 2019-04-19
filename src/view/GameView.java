@@ -37,7 +37,7 @@ public class GameView extends JFrame {
 
     private void initInfoPanel() {
         infoPanel = new JPanel();
-        infoPanel.setPreferredSize(new Dimension(400, getHeight()));
+        infoPanel.setPreferredSize(new Dimension(450, getHeight()));
         infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.PAGE_AXIS));
         infoPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, 0));
 

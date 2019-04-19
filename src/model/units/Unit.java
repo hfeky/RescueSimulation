@@ -153,10 +153,10 @@ public abstract class Unit implements Simulatable, SOSResponder {
 
     @Override
     public void respond(Rescuable r) throws UnitException {
-        if (((this instanceof FireUnit || this instanceof PoliceUnit || this instanceof GasControlUnit)
-                && r instanceof Citizen)
-                || ((this instanceof MedicalUnit || this instanceof DiseaseControlUnit)
-                && r instanceof ResidentialBuilding)) throw new IncompatibleTargetException(this, r);
+        if (((this instanceof FireUnit || this instanceof PoliceUnit || this instanceof GasControlUnit) && r instanceof Citizen)
+                || ((this instanceof MedicalUnit) && r instanceof ResidentialBuilding)) {
+            throw new IncompatibleTargetException(this, r);
+        }
         if (!canTreat(r)) throw new CannotTreatException(this, r);
         setState(UnitState.RESPONDING);
         if (target != null) {
@@ -174,23 +174,23 @@ public abstract class Unit implements Simulatable, SOSResponder {
                 Math.abs(target.getLocation().getY() - getLocation().getY()));
     }
 
-    public boolean canTreat(Rescuable r) {
+    private boolean canTreat(Rescuable r) {
         if (r instanceof ResidentialBuilding) {
-            ResidentialBuilding b = (ResidentialBuilding) r;
-            return (this instanceof FireTruck && b.getFireDamage() != 0)
-                    || (this instanceof Evacuator && b.getFoundationDamage() != 0)
-                    || (this instanceof GasControlUnit && b.getGasLevel() != 0);
+            ResidentialBuilding building = (ResidentialBuilding) r;
+            return (this instanceof Evacuator && building.getFoundationDamage() != 0)
+                    || (this instanceof FireTruck && building.getFireDamage() != 0)
+                    || (this instanceof GasControlUnit && building.getGasLevel() != 0);
         } else if (r instanceof Citizen) {
-            Citizen c = (Citizen) r;
-            return (this instanceof Ambulance && c.getBloodLoss() != 0)
-                    || (this instanceof DiseaseControlUnit && c.getToxicity() != 0);
+            Citizen citizen = (Citizen) r;
+            return (this instanceof Ambulance && citizen.getBloodLoss() != 0)
+                    || (this instanceof DiseaseControlUnit && citizen.getToxicity() != 0);
         }
         return false;
     }
 
     @Override
     public String toString() {
-        return "<b>" + getClass().getSimpleName()+ ":</b>" +
+        return "<b>" + getClass().getSimpleName() + ":</b>" +
                 "\nLocation: (" + location.getX() + "," + location.getY() + ")" +
                 "\nUnit ID: " + unitID +
                 "\nSteps Per Cycle: " + stepsPerCycle +

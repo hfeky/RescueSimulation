@@ -1,12 +1,14 @@
 package exceptions;
 
+import model.infrastructure.ResidentialBuilding;
+import model.people.Citizen;
 import model.units.Unit;
 import simulation.Rescuable;
 
 public class CannotTreatException extends UnitException {
 
     public CannotTreatException(Unit unit, Rescuable target) {
-        super(unit, target, "The " + target.getClass().getSimpleName() + " is already safe.");
+        this(unit, target, ((target instanceof ResidentialBuilding) ? "The ResidentialBuilding" : target.getClass().getSimpleName() + " " + ((Citizen) target).getName()) + " is already safe.");
     }
 
     public CannotTreatException(Unit unit, Rescuable target, String message) {

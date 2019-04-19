@@ -186,7 +186,17 @@ public class Simulator implements WorldListener {
 
     public void nextCycle() throws DisasterException {
         currentCycle++;
+
         StringBuilder cycleLog = new StringBuilder();
+        boolean[] wasCollapsed = new boolean[buildings.size()];
+        boolean[] wasDead = new boolean[citizens.size()];
+        for (int i = 0; i < buildings.size(); i++) {
+            wasCollapsed[i] = buildings.get(i).getStructuralIntegrity() == 0;
+        }
+        for (int i = 0; i < citizens.size(); i++) {
+            wasDead[i] = citizens.get(i).getState() == CitizenState.DECEASED;
+        }
+
         for (int i = 0; i < plannedDisasters.size(); ) {
             Disaster disaster = plannedDisasters.get(i);
             if (disaster.getStartCycle() == currentCycle) {
@@ -253,29 +263,25 @@ public class Simulator implements WorldListener {
         for (Disaster disaster : executedDisasters) {
             if (disaster.isActive() && disaster.getStartCycle() < currentCycle) disaster.cycleStep();
         }
-        for (ResidentialBuilding building : buildings) {
-            boolean wasCollapsed = building.getStructuralIntegrity() == 0;
+        for (int i = 0; i < buildings.size(); i++) {
+            ResidentialBuilding building = buildings.get(i);
             building.cycleStep();
-            if (!wasCollapsed && building.getStructuralIntegrity() == 0) {
+            if (!wasCollapsed[i] && building.getStructuralIntegrity() == 0) {
                 cycleLog.append("ResidentialBuilding has just collapsed at location (")
                         .append(building.getLocation().getX()).append(",")
                         .append(building.getLocation().getY()).append(").\n");
-                for (Citizen citizen : building.getOccupants()) {
-                    cycleLog.append("Citizen ").append(citizen.getName()).append(" has just died at location (")
-                            .append(citizen.getLocation().getX()).append(",")
-                            .append(citizen.getLocation().getY()).append(").\n");
-                }
             }
         }
-        for (Citizen citizen : citizens) {
-            boolean wasDead = citizen.getState() == CitizenState.DECEASED;
+        for (int i = 0; i < citizens.size(); i++) {
+            Citizen citizen = citizens.get(i);
             citizen.cycleStep();
-            if (!wasDead && citizen.getState() == CitizenState.DECEASED) {
+            if (!wasDead[i] && citizen.getState() == CitizenState.DECEASED) {
                 cycleLog.append("Citizen ").append(citizen.getName()).append(" has just died at location (")
                         .append(citizen.getLocation().getX()).append(",")
                         .append(citizen.getLocation().getY()).append(").\n");
             }
         }
+
         if (cycleLog.length() > 0) {
             cycleLog.insert(0, "Cycle " + currentCycle + ":\n");
             gameView.addToLog(cycleLog.toString());

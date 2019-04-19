@@ -5,7 +5,7 @@ import model.disasters.Disaster;
 public class BuildingAlreadyCollapsedException extends DisasterException {
 
     public BuildingAlreadyCollapsedException(Disaster disaster) {
-        super(disaster, "The ResidentialBuilding is already collapsed.");
+        this(disaster, "The ResidentialBuilding is already collapsed.");
     }
 
     public BuildingAlreadyCollapsedException(Disaster disaster, String message) {

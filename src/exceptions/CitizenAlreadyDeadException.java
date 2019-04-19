@@ -5,7 +5,7 @@ import model.disasters.Disaster;
 public class CitizenAlreadyDeadException extends DisasterException {
 
     public CitizenAlreadyDeadException(Disaster disaster) {
-        super(disaster, "The Citizen is already dead.");
+        this(disaster, "The Citizen is already dead.");
     }
 
     public CitizenAlreadyDeadException(Disaster disaster, String message) {

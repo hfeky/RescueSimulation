@@ -37,10 +37,11 @@ public abstract class Disaster implements Simulatable {
     }
 
     public void strike() throws DisasterException {
-        if (target instanceof ResidentialBuilding && ((ResidentialBuilding) target).getStructuralIntegrity() == 0)
+        if (target instanceof ResidentialBuilding && ((ResidentialBuilding) target).getStructuralIntegrity() == 0) {
             throw new BuildingAlreadyCollapsedException(this);
-        else if (target instanceof Citizen && ((Citizen) target).getState() == CitizenState.DECEASED)
+        } else if (target instanceof Citizen && ((Citizen) target).getState() == CitizenState.DECEASED) {
             throw new CitizenAlreadyDeadException(this);
+        }
         setActive(true);
         target.struckBy(this);
     }
