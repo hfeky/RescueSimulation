@@ -1,34 +1,25 @@
 package view;
 
-import controller.CommandCenter;
-import exceptions.DisasterException;
-import model.infrastructure.ResidentialBuilding;
-import model.people.Citizen;
 import model.units.Unit;
 import model.units.UnitState;
 import simulation.Rescuable;
 import simulation.Simulatable;
-import simulation.Simulator;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class GameView extends JFrame {
 
     private JPanel infoPanel, gridPanel, unitsPanel;
     private JPanel availableUnits, respondingUnits, treatingUnits;
     private JLabel cycleInfo;
+    private JButton nextCycle;
     private JTextArea disastersInfo;
     private JTextArea logInfo;
 
     private static final int PADDING = 10;
 
-    private Simulator engine;
-
-    public GameView(Simulator engine) {
-        this.engine = engine;
+    public GameView() {
         setTitle("Rescue Simulation");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -39,7 +30,7 @@ public class GameView extends JFrame {
         initInfoPanel();
         initGridPanel();
         initUnitsPanel();
-        initWorldMap();
+        //initWorldMap();
 
         setVisible(true);
     }
@@ -98,23 +89,8 @@ public class GameView extends JFrame {
 
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
-        JButton nextCycle = new JButton("Next Cycle");
+        nextCycle = new JButton("Next Cycle");
         nextCycle.setPreferredSize(new Dimension(180, 50));
-        nextCycle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!engine.checkGameOver()) {
-                    try {
-                        engine.nextCycle();
-                        setCycleInfo(engine.getCurrentCycle(), engine.calculateCasualties());
-                    } catch (DisasterException de) {
-                        de.printStackTrace();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(GameView.this, "Game Over!");
-                }
-            }
-        });
         controlPanel.add(nextCycle);
         unitsPanel.add(controlPanel);
         unitsPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
@@ -123,10 +99,6 @@ public class GameView extends JFrame {
         availableUnits.setLayout(new GridLayout(3, 2));
         availableUnits.setPreferredSize(new Dimension(getWidth(), 300));
         availableUnits.setBorder(BorderFactory.createTitledBorder("Available Units"));
-        for (Unit unit : engine.getEmergencyUnits()) {
-            UnitBlock unitBlock = new UnitBlock(unit);
-            availableUnits.add(unitBlock);
-        }
         unitsPanel.add(availableUnits);
         unitsPanel.add(Box.createRigidArea(new Dimension(0, PADDING)));
 
@@ -146,17 +118,17 @@ public class GameView extends JFrame {
         add(unitsPanel, BorderLayout.EAST);
     }
 
-    private void initWorldMap() {
-        for (ResidentialBuilding building : engine.getBuildings()) {
-            addSimulatableOnWorldMap(building);
-        }
-        for (Citizen citizen : engine.getCitizens()) {
-            addSimulatableOnWorldMap(citizen);
-        }
-        for (Unit unit : engine.getEmergencyUnits()) {
-            addSimulatableOnWorldMap(unit);
-        }
-    }
+//    private void initWorldMap() {
+//        for (ResidentialBuilding building : engine.getBuildings()) {
+//            addSimulatableOnWorldMap(building);
+//        }
+//        for (Citizen citizen : engine.getCitizens()) {
+//            addSimulatableOnWorldMap(citizen);
+//        }
+//        for (Unit unit : engine.getEmergencyUnits()) {
+//            addSimulatableOnWorldMap(unit);
+//        }
+//    }
 
     public void removeSimulatableOnWorldMap(Simulatable simulatable) {
         WorldBlock worldBlock;
@@ -245,6 +217,10 @@ public class GameView extends JFrame {
         getAvailableUnits().validate();
         getRespondingUnits().validate();
         getTreatingUnits().validate();
+    }
+
+    public JButton getNextCycle() {
+        return nextCycle;
     }
 
     public JPanel getGridPanel() {

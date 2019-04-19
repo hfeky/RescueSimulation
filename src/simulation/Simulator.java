@@ -148,14 +148,6 @@ public class Simulator implements WorldListener {
         }
     }
 
-    public ArrayList<ResidentialBuilding> getBuildings() {
-        return buildings;
-    }
-
-    public ArrayList<Citizen> getCitizens() {
-        return citizens;
-    }
-
     public ArrayList<Unit> getEmergencyUnits() {
         return emergencyUnits;
     }
@@ -190,11 +182,6 @@ public class Simulator implements WorldListener {
             if (citizen.getState() == CitizenState.DECEASED) casualties++;
         }
         return casualties;
-    }
-
-    // Gets current cycle
-    public int getCurrentCycle() {
-        return currentCycle;
     }
 
     public void nextCycle() throws DisasterException {
@@ -247,10 +234,6 @@ public class Simulator implements WorldListener {
                 i++;
             }
         }
-        if (cycleLog.length() > 0) {
-            cycleLog.insert(0, "Cycle " + currentCycle + ":\n");
-            gameView.addToLog(cycleLog.toString());
-        }
         for (ResidentialBuilding building : buildings) {
             if (building.getFireDamage() == 100) {
                 Collapse collapse = new Collapse(currentCycle, building);
@@ -271,11 +254,33 @@ public class Simulator implements WorldListener {
             if (disaster.isActive() && disaster.getStartCycle() < currentCycle) disaster.cycleStep();
         }
         for (ResidentialBuilding building : buildings) {
+            boolean wasCollapsed = building.getStructuralIntegrity() == 0;
             building.cycleStep();
+            if (!wasCollapsed && building.getStructuralIntegrity() == 0) {
+                cycleLog.append("ResidentialBuilding has just collapsed at location (")
+                        .append(building.getLocation().getX()).append(",")
+                        .append(building.getLocation().getY()).append(").\n");
+                for (Citizen citizen : building.getOccupants()) {
+                    cycleLog.append("Citizen ").append(citizen.getName()).append(" has just died at location (")
+                            .append(citizen.getLocation().getX()).append(",")
+                            .append(citizen.getLocation().getY()).append(").\n");
+                }
+            }
         }
         for (Citizen citizen : citizens) {
+            boolean wasDead = citizen.getState() == CitizenState.DECEASED;
             citizen.cycleStep();
+            if (!wasDead && citizen.getState() == CitizenState.DECEASED) {
+                cycleLog.append("Citizen ").append(citizen.getName()).append(" has just died at location (")
+                        .append(citizen.getLocation().getX()).append(",")
+                        .append(citizen.getLocation().getY()).append(").\n");
+            }
         }
+        if (cycleLog.length() > 0) {
+            cycleLog.insert(0, "Cycle " + currentCycle + ":\n");
+            gameView.addToLog(cycleLog.toString());
+        }
+        gameView.setCycleInfo(currentCycle, calculateCasualties());
         gameView.invalidateUnitsPanel();
         StringBuilder activeDisasters = new StringBuilder();
         for (Disaster disaster : executedDisasters) {

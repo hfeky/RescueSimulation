@@ -1,11 +1,13 @@
 package controller;
 
+import exceptions.DisasterException;
 import exceptions.UnitException;
 import model.events.SOSListener;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.units.Unit;
 import simulation.Rescuable;
+import simulation.Simulatable;
 import simulation.Simulator;
 import view.GameView;
 import view.UnitBlock;
@@ -23,18 +25,19 @@ public class CommandCenter implements SOSListener {
     private Simulator engine;
     private ArrayList<ResidentialBuilding> visibleBuildings = new ArrayList<>();
     private ArrayList<Citizen> visibleCitizens = new ArrayList<>();
-    private ArrayList<Unit> emergencyUnits = new ArrayList<>();
+    private ArrayList<Unit> emergencyUnits;
     private GameView gameView;
 
     private UnitBlock selectedUnit;
 
     public CommandCenter() throws Exception {
         engine = new Simulator(this);
-        gameView = new GameView(engine);
+        emergencyUnits = engine.getEmergencyUnits();
+        gameView = new GameView();
         engine.setGameView(gameView);
 
-        for (int i = 0; i < gameView.getAvailableUnits().getComponentCount(); i++) {
-            UnitBlock unitBlock = (UnitBlock) gameView.getAvailableUnits().getComponent(i);
+        for (Unit unit : emergencyUnits) {
+            UnitBlock unitBlock = new UnitBlock(unit);
             unitBlock.addItemListener(new ItemListener() {
                 @Override
                 public void itemStateChanged(ItemEvent e) {
@@ -50,7 +53,25 @@ public class CommandCenter implements SOSListener {
                     }
                 }
             });
+            gameView.getAvailableUnits().add(unitBlock);
+            gameView.addSimulatableOnWorldMap(unit);
         }
+        gameView.getAvailableUnits().validate();
+
+        gameView.getNextCycle().addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!engine.checkGameOver()) {
+                    try {
+                        engine.nextCycle();
+                    } catch (DisasterException de) {
+                        de.printStackTrace();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(gameView, "Game Over!");
+                }
+            }
+        });
 
         for (int i = 0; i < gameView.getGridPanel().getComponentCount(); i++) {
             WorldBlock worldBlock = (WorldBlock) gameView.getGridPanel().getComponent(i);
@@ -82,22 +103,7 @@ public class CommandCenter implements SOSListener {
         } else if (r instanceof ResidentialBuilding) {
             visibleBuildings.add((ResidentialBuilding) r);
         }
-    }
-
-    public ArrayList<Citizen> getVisibleCitizens() {
-        return visibleCitizens;
-    }
-
-    public ArrayList<ResidentialBuilding> getVisibleBuildings() {
-        return visibleBuildings;
-    }
-
-    public ArrayList<Unit> getEmergencyUnits() {
-        return emergencyUnits;
-    }
-
-    public GameView getGameView() {
-        return gameView;
+        gameView.addSimulatableOnWorldMap((Simulatable) r);
     }
 
     public static void main(String[] args) throws Exception {

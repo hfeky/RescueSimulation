@@ -8,6 +8,8 @@ import simulation.Simulatable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -19,6 +21,12 @@ public class WorldBlock extends JButton {
     private ArrayList<Unit> units = new ArrayList<>();
 
     public WorldBlock() {
+        addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -78,7 +86,7 @@ public class WorldBlock extends JButton {
         } else if (rescuable instanceof Citizen) {
             graphics.drawImage(new ImageIcon("assets/ico/citizen.png").getImage(), 0, 0, 70, 70, this);
         }
-        if (rescuable == null) {
+        if (rescuable == null || units.size() > 1) {
             if (units.size() == 5) {
                 ImageIcon subIcon1 = getUnitIcon(units.get(0));
                 if (subIcon1 != null) {
