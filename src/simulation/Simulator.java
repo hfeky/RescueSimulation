@@ -9,6 +9,7 @@ import model.people.Citizen;
 import model.people.CitizenState;
 import model.units.*;
 import view.GameView;
+import view.WorldBlock;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -146,6 +147,14 @@ public class Simulator implements WorldListener {
                 gameView.addSimulatableOnWorldMap(unit);
             }
         }
+    }
+
+    public ArrayList<ResidentialBuilding> getBuildings() {
+        return buildings;
+    }
+
+    public ArrayList<Citizen> getCitizens() {
+        return citizens;
     }
 
     public ArrayList<Unit> getEmergencyUnits() {
@@ -299,6 +308,10 @@ public class Simulator implements WorldListener {
             }
         }
         gameView.setActiveDisasters(activeDisasters.toString().trim());
+        for (int i = 0; i < gameView.getGridPanel().getComponentCount(); i++) {
+            WorldBlock worldBlock = (WorldBlock) gameView.getGridPanel().getComponent(i);
+            worldBlock.requestLayout();
+        }
     }
 
     public void setGameView(GameView gameView) {

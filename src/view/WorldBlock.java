@@ -1,5 +1,7 @@
 package view;
 
+import javafx.util.Pair;
+import model.disasters.Disaster;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.units.*;
@@ -8,8 +10,6 @@ import simulation.Simulatable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -17,27 +17,34 @@ import java.util.ArrayList;
 
 public class WorldBlock extends JButton {
 
-    private Rescuable rescuable;
-    private ArrayList<Unit> units = new ArrayList<>();
+    private Disaster disaster;
+    private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
+    private ArrayList<Citizen> citizens = new ArrayList<>();
+    private ArrayList<Ambulance> ambulances = new ArrayList<>();
+    private ArrayList<DiseaseControlUnit> diseaseUnits = new ArrayList<>();
+    private ArrayList<Evacuator> evacuators = new ArrayList<>();
+    private ArrayList<FireTruck> fireTrucks = new ArrayList<>();
+    private ArrayList<GasControlUnit> gasUnits = new ArrayList<>();
+
+    private final int DISASTER_COLOR = 0xFF4FC3F7;
+    private final int DEAD_COLOR = 0xFFB71C1C;
 
     public WorldBlock() {
-        addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 WorldBlock.this.setBackground(Color.GREEN);
                 StringBuilder blockInfo = new StringBuilder();
-                if (rescuable != null) {
-                    blockInfo.append("<b>").append(rescuable.getClass().getSimpleName()).append(":</b>\n").append(rescuable.toString());
+                if (buildings.size() > 0) {
+                    blockInfo = addToBlockInfo(blockInfo, buildings);
+                } else if (citizens.size() > 0) {
+                    blockInfo = addToBlockInfo(blockInfo, citizens);
                 }
-                for (int i = 1; i <= units.size(); i++) {
-                    blockInfo.append("\n\n").append(units.get(i - 1).toString());
-                }
+                blockInfo = addToBlockInfo(blockInfo, ambulances);
+                blockInfo = addToBlockInfo(blockInfo, diseaseUnits);
+                blockInfo = addToBlockInfo(blockInfo, evacuators);
+                blockInfo = addToBlockInfo(blockInfo, fireTrucks);
+                blockInfo = addToBlockInfo(blockInfo, gasUnits);
                 if (blockInfo.length() > 0) {
                     setToolTipText("<html>" + blockInfo.toString().trim().replaceAll("\n", "<br>") + "</html>");
                 }
@@ -45,137 +52,177 @@ public class WorldBlock extends JButton {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                WorldBlock.this.setBackground(UIManager.getColor("control"));
+                updateBackgroundColor();
             }
         });
     }
 
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        requestLayout();
+    }
+
+    private StringBuilder addToBlockInfo(StringBuilder blockInfo, ArrayList<? extends Simulatable> list) {
+        if (list.size() == 1) {
+            Simulatable simulatable = list.get(0);
+            blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName()).append(":</b>\n").append(simulatable.toString());
+        } else {
+            for (int i = 1; i <= list.size(); i++) {
+                Simulatable simulatable = list.get(i - 1);
+                blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName()).append(" ").append(i).append(":</b>\n").append(simulatable.toString());
+            }
+        }
+        return blockInfo;
+    }
+
+    public void setDisaster(Disaster disaster) {
+        this.disaster = disaster;
+    }
+
     public void addSimulatable(Simulatable simulatable) {
         if (simulatable instanceof ResidentialBuilding) {
-            rescuable = (ResidentialBuilding) simulatable;
-        } else if (simulatable instanceof Citizen) {
-            if (rescuable == null) {
-                rescuable = (Citizen) simulatable;
+            if (!buildings.contains(simulatable)) {
+                buildings.add((ResidentialBuilding) simulatable);
             }
-        } else if (simulatable instanceof Unit) {
-            units.add((Unit) simulatable);
+        } else if (simulatable instanceof Citizen) {
+            if (!citizens.contains(simulatable)) {
+                citizens.add((Citizen) simulatable);
+            }
+        } else if (simulatable instanceof Ambulance) {
+            if (!ambulances.contains(simulatable)) {
+                ambulances.add((Ambulance) simulatable);
+            }
+        } else if (simulatable instanceof DiseaseControlUnit) {
+            if (!diseaseUnits.contains(simulatable)) {
+                diseaseUnits.add((DiseaseControlUnit) simulatable);
+            }
+        } else if (simulatable instanceof Evacuator) {
+            if (!evacuators.contains(simulatable)) {
+                evacuators.add((Evacuator) simulatable);
+            }
+        } else if (simulatable instanceof FireTruck) {
+            if (!fireTrucks.contains(simulatable)) {
+                fireTrucks.add((FireTruck) simulatable);
+            }
+        } else if (simulatable instanceof GasControlUnit) {
+            if (!gasUnits.contains(simulatable)) {
+                gasUnits.add((GasControlUnit) simulatable);
+            }
+        } else if (simulatable instanceof Disaster) {
+            this.disaster = (Disaster) simulatable;
         }
         requestLayout();
     }
 
     public void removeSimulatable(Simulatable simulatable) {
         if (simulatable instanceof ResidentialBuilding) {
-            if (simulatable == rescuable) rescuable = null;
+            buildings.remove(simulatable);
         } else if (simulatable instanceof Citizen) {
-            if (simulatable == rescuable) rescuable = null;
-        } else if (simulatable instanceof Unit) {
-            units.remove(simulatable);
+            citizens.remove(simulatable);
+        } else if (simulatable instanceof Ambulance) {
+            ambulances.remove(simulatable);
+        } else if (simulatable instanceof DiseaseControlUnit) {
+            diseaseUnits.remove(simulatable);
+        } else if (simulatable instanceof Evacuator) {
+            evacuators.remove(simulatable);
+        } else if (simulatable instanceof FireTruck) {
+            fireTrucks.remove(simulatable);
+        } else if (simulatable instanceof GasControlUnit) {
+            gasUnits.remove(simulatable);
+        } else if (simulatable instanceof Disaster) {
+            this.disaster = null;
         }
         requestLayout();
     }
 
-    public Rescuable getRescuable() {
-        return rescuable;
+    public Rescuable getMainRescuable() {
+        return buildings.size() > 0 ? buildings.get(0) : citizens.size() > 0 ? citizens.get(0) : null;
     }
 
-    private void requestLayout() {
-        BufferedImage bufferedImage = new BufferedImage(70, 70, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = bufferedImage.getGraphics();
-        if (rescuable instanceof ResidentialBuilding) {
-            graphics.drawImage(new ImageIcon("assets/ico/building.png").getImage(), 0, 0, 70, 70, this);
-        } else if (rescuable instanceof Citizen) {
-            graphics.drawImage(new ImageIcon("assets/ico/citizen.png").getImage(), 0, 0, 70, 70, this);
-        }
-        if (rescuable == null || units.size() > 1) {
-            if (units.size() == 5) {
-                ImageIcon subIcon1 = getUnitIcon(units.get(0));
-                if (subIcon1 != null) {
-                    graphics.drawImage(subIcon1.getImage(), 0, 0, 35, 35, this);
+    private ArrayList<Pair<String, Integer>> getAllPairs() {
+        ArrayList<Pair<String, Integer>> pairs = new ArrayList<>();
+        if (buildings.size() > 0) pairs.add(new Pair<>("building", buildings.size()));
+        if (ambulances.size() > 0) pairs.add(new Pair<>("ambulance", ambulances.size()));
+        if (diseaseUnits.size() > 0) pairs.add(new Pair<>("disease_control", diseaseUnits.size()));
+        if (evacuators.size() > 0) pairs.add(new Pair<>("evacuator", evacuators.size()));
+        if (fireTrucks.size() > 0) pairs.add(new Pair<>("fire_truck", fireTrucks.size()));
+        if (gasUnits.size() > 0) pairs.add(new Pair<>("gas_control", gasUnits.size()));
+        if (citizens.size() > 0) pairs.add(new Pair<>("citizen", citizens.size()));
+        return pairs;
+    }
+
+    public void requestLayout() {
+        if (getWidth() != 0 && getHeight() != 0) {
+            updateBackgroundColor();
+            BufferedImage bufferedImage = new BufferedImage(90, 80, BufferedImage.TYPE_INT_ARGB);
+            Graphics graphics = bufferedImage.getGraphics();
+            ArrayList<Pair<String, Integer>> pairs = getAllPairs();
+            if (pairs.size() == 6) {
+                graphics.drawImage(getIcon(pairs.get(0).getKey()), 0, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(1).getKey()), 30, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(2).getKey()), 60, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(3).getKey()), 0, 40, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(4).getKey()), 30, 40, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(5).getKey()), 60, 40, 30, 30, this);
+            } else if (pairs.size() == 5) {
+                graphics.drawImage(getIcon(pairs.get(0).getKey()), 0, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(1).getKey()), 30, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(2).getKey()), 60, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(3).getKey()), 15, 40, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(4).getKey()), 45, 40, 30, 30, this);
+            } else if (pairs.size() == 4) {
+                graphics.drawImage(getIcon(pairs.get(0).getKey()), 15, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(1).getKey()), 45, 10, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(2).getKey()), 15, 40, 30, 30, this);
+                graphics.drawImage(getIcon(pairs.get(3).getKey()), 45, 40, 30, 30, this);
+            } else if (pairs.size() == 3) {
+                if (pairs.get(0).getKey().equals("building") && pairs.get(2).getKey().equals("citizen")) {
+                    graphics.drawImage(getIcon(pairs.get(0).getKey()), 5, 0, 80, 80, this);
+                    graphics.drawImage(getIcon(pairs.get(2).getKey()), 0, 35, 45, 45, this);
+                    graphics.drawImage(getIcon(pairs.get(1).getKey()), 45, 35, 45, 45, this);
+                } else {
+                    graphics.drawImage(getIcon(pairs.get(0).getKey()), 15, 10, 30, 30, this);
+                    graphics.drawImage(getIcon(pairs.get(1).getKey()), 45, 10, 30, 30, this);
+                    graphics.drawImage(getIcon(pairs.get(2).getKey()), 30, 40, 30, 30, this);
                 }
-                ImageIcon subIcon2 = getUnitIcon(units.get(1));
-                if (subIcon2 != null) {
-                    graphics.drawImage(subIcon2.getImage(), 35, 0, 35, 35, this);
+            } else if (pairs.size() == 2) {
+                if (pairs.get(0).getKey().equals("building")) {
+                    if (pairs.get(1).getKey().equals("citizen")) {
+                        graphics.drawImage(getIcon(pairs.get(0).getKey()), 5, 0, 80, 80, this);
+                        graphics.drawImage(getIcon(pairs.get(1).getKey()), 0, 35, 45, 45, this);
+                    } else {
+                        graphics.drawImage(getIcon(pairs.get(0).getKey()), 5, 0, 80, 80, this);
+                        graphics.drawImage(getIcon(pairs.get(1).getKey()), 45, 35, 45, 45, this);
+                    }
+                } else if (pairs.get(1).getKey().equals("citizen")) {
+                    graphics.drawImage(getIcon(pairs.get(0).getKey()), 5, 0, 80, 80, this);
+                    graphics.drawImage(getIcon(pairs.get(1).getKey()), 45, 35, 45, 45, this);
+                } else {
+                    graphics.drawImage(getIcon(pairs.get(0).getKey()), 15, 25, 30, 30, this);
+                    graphics.drawImage(getIcon(pairs.get(1).getKey()), 45, 25, 30, 30, this);
                 }
-                ImageIcon subIcon3 = getUnitIcon(units.get(2));
-                if (subIcon3 != null) {
-                    graphics.drawImage(subIcon3.getImage(), 0, 35, 35, 35, this);
-                }
-                ImageIcon subIcon4 = getUnitIcon(units.get(3));
-                if (subIcon4 != null) {
-                    graphics.drawImage(subIcon4.getImage(), 35, 35, 35, 35, this);
-                }
-                ImageIcon subIcon5 = getUnitIcon(units.get(4));
-                if (subIcon5 != null) {
-                    graphics.drawImage(subIcon5.getImage(), 17, 17, 35, 35, this);
-                }
-            } else if (units.size() == 4) {
-                ImageIcon subIcon1 = getUnitIcon(units.get(0));
-                if (subIcon1 != null) {
-                    graphics.drawImage(subIcon1.getImage(), 0, 0, 35, 35, this);
-                }
-                ImageIcon subIcon2 = getUnitIcon(units.get(1));
-                if (subIcon2 != null) {
-                    graphics.drawImage(subIcon2.getImage(), 35, 0, 35, 35, this);
-                }
-                ImageIcon subIcon3 = getUnitIcon(units.get(2));
-                if (subIcon3 != null) {
-                    graphics.drawImage(subIcon3.getImage(), 0, 35, 35, 35, this);
-                }
-                ImageIcon subIcon4 = getUnitIcon(units.get(3));
-                if (subIcon4 != null) {
-                    graphics.drawImage(subIcon4.getImage(), 35, 35, 35, 35, this);
-                }
-            } else if (units.size() == 3) {
-                ImageIcon subIcon1 = getUnitIcon(units.get(0));
-                if (subIcon1 != null) {
-                    graphics.drawImage(subIcon1.getImage(), 0, 0, 35, 35, this);
-                }
-                ImageIcon subIcon2 = getUnitIcon(units.get(1));
-                if (subIcon2 != null) {
-                    graphics.drawImage(subIcon2.getImage(), 35, 0, 35, 35, this);
-                }
-                ImageIcon subIcon3 = getUnitIcon(units.get(2));
-                if (subIcon3 != null) {
-                    graphics.drawImage(subIcon3.getImage(), 17, 35, 35, 35, this);
-                }
-            } else if (units.size() == 2) {
-                ImageIcon subIcon1 = getUnitIcon(units.get(0));
-                if (subIcon1 != null) {
-                    graphics.drawImage(subIcon1.getImage(), 17, 0, 35, 35, this);
-                }
-                ImageIcon subIcon2 = getUnitIcon(units.get(1));
-                if (subIcon2 != null) {
-                    graphics.drawImage(subIcon2.getImage(), 17, 35, 35, 35, this);
-                }
-            } else if (units.size() == 1) {
-                ImageIcon subIcon1 = getUnitIcon(units.get(0));
-                if (subIcon1 != null) {
-                    graphics.drawImage(subIcon1.getImage(), 0, 0, 70, 70, this);
-                }
+            } else if (pairs.size() == 1) {
+                graphics.drawImage(getIcon(pairs.get(0).getKey()), 5, 0, 80, 80, this);
             }
+            setIcon(new ImageIcon(bufferedImage));
+        }
+    }
+
+    private void updateBackgroundColor() {
+        Rescuable rescuable = getMainRescuable();
+        if (rescuable != null &&
+                ((rescuable instanceof ResidentialBuilding && ((ResidentialBuilding) rescuable).isCollapsed())
+                        || (rescuable instanceof Citizen && ((Citizen) rescuable).isDead()))) {
+            setBackground(new Color(DEAD_COLOR));
+        } else if (rescuable != null && rescuable.getDisaster() != null && rescuable.getDisaster().isActive()) {
+            setBackground(new Color(DISASTER_COLOR));
         } else {
-            for (Unit unit : units) {
-                ImageIcon subIcon = getUnitIcon(unit);
-                if (subIcon != null) {
-                    graphics.drawImage(subIcon.getImage(), 30, 30, 40, 40, this);
-                }
-            }
+            setBackground(UIManager.getColor("control"));
         }
-        setIcon(new ImageIcon(bufferedImage));
     }
 
-    private ImageIcon getUnitIcon(Unit unit) {
-        if (unit instanceof Ambulance) {
-            return new ImageIcon("assets/ico/ambulance.png");
-        } else if (unit instanceof DiseaseControlUnit) {
-            return new ImageIcon("assets/ico/disease_control.png");
-        } else if (unit instanceof FireTruck) {
-            return new ImageIcon("assets/ico/fire_truck.png");
-        } else if (unit instanceof GasControlUnit) {
-            return new ImageIcon("assets/ico/gas_control.png");
-        } else if (unit instanceof Evacuator) {
-            return new ImageIcon("assets/ico/evacuator.png");
-        }
-        return null;
+    private Image getIcon(String iconName) {
+        return new ImageIcon("assets/ico/" + iconName + ".png").getImage();
     }
 }

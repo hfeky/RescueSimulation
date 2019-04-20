@@ -7,7 +7,6 @@ import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.units.Unit;
 import simulation.Rescuable;
-import simulation.Simulatable;
 import simulation.Simulator;
 import view.GameView;
 import view.UnitBlock;
@@ -68,7 +67,7 @@ public class CommandCenter implements SOSListener {
                         de.printStackTrace();
                     }
                 } else {
-                    JOptionPane.showMessageDialog(gameView, "Game Over!");
+                    JOptionPane.showMessageDialog(gameView, "Game Over! Casualties: " + engine.calculateCasualties());
                 }
             }
         });
@@ -79,7 +78,7 @@ public class CommandCenter implements SOSListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (selectedUnit != null) {
-                        Rescuable rescuable = worldBlock.getRescuable();
+                        Rescuable rescuable = worldBlock.getMainRescuable();
                         if (rescuable != null) {
                             try {
                                 selectedUnit.getUnit().respond(rescuable);
@@ -94,6 +93,8 @@ public class CommandCenter implements SOSListener {
                 }
             });
         }
+
+        initWorldMap();
     }
 
     @Override
@@ -103,7 +104,20 @@ public class CommandCenter implements SOSListener {
         } else if (r instanceof ResidentialBuilding) {
             visibleBuildings.add((ResidentialBuilding) r);
         }
-        gameView.addSimulatableOnWorldMap((Simulatable) r);
+        gameView.addSimulatableOnWorldMap(r.getDisaster());
+        //gameView.addSimulatableOnWorldMap((Simulatable) r);
+    }
+
+    private void initWorldMap() {
+        for (ResidentialBuilding building : engine.getBuildings()) {
+            gameView.addSimulatableOnWorldMap(building);
+        }
+        for (Citizen citizen : engine.getCitizens()) {
+            gameView.addSimulatableOnWorldMap(citizen);
+        }
+        for (Unit unit : engine.getEmergencyUnits()) {
+            gameView.addSimulatableOnWorldMap(unit);
+        }
     }
 
     public static void main(String[] args) throws Exception {

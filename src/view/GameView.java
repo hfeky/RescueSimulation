@@ -1,5 +1,6 @@
 package view;
 
+import model.disasters.Disaster;
 import model.units.Unit;
 import model.units.UnitState;
 import simulation.Rescuable;
@@ -30,7 +31,6 @@ public class GameView extends JFrame {
         initInfoPanel();
         initGridPanel();
         initUnitsPanel();
-        //initWorldMap();
 
         setVisible(true);
     }
@@ -118,36 +118,30 @@ public class GameView extends JFrame {
         add(unitsPanel, BorderLayout.EAST);
     }
 
-//    private void initWorldMap() {
-//        for (ResidentialBuilding building : engine.getBuildings()) {
-//            addSimulatableOnWorldMap(building);
-//        }
-//        for (Citizen citizen : engine.getCitizens()) {
-//            addSimulatableOnWorldMap(citizen);
-//        }
-//        for (Unit unit : engine.getEmergencyUnits()) {
-//            addSimulatableOnWorldMap(unit);
-//        }
-//    }
-
-    public void removeSimulatableOnWorldMap(Simulatable simulatable) {
-        WorldBlock worldBlock;
+    public void addSimulatableOnWorldMap(Simulatable simulatable) {
         if (simulatable instanceof Rescuable) {
-            worldBlock = (WorldBlock) gridPanel.getComponent(((Rescuable) simulatable).getLocation().getY() * 10 + ((Rescuable) simulatable).getLocation().getX());
+            ((WorldBlock) gridPanel.getComponent(((Rescuable) simulatable).getLocation().getY() * 10 +
+                    ((Rescuable) simulatable).getLocation().getX())).addSimulatable(simulatable);
+        } else if (simulatable instanceof Unit){
+            ((WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 +
+                    ((Unit) simulatable).getLocation().getX())).addSimulatable(simulatable);
         } else {
-            worldBlock = (WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 + ((Unit) simulatable).getLocation().getX());
+            ((WorldBlock) gridPanel.getComponent(((Disaster) simulatable).getTarget().getLocation().getY() * 10 +
+                    ((Disaster) simulatable).getTarget().getLocation().getX())).addSimulatable(simulatable);
         }
-        worldBlock.removeSimulatable(simulatable);
     }
 
-    public void addSimulatableOnWorldMap(Simulatable simulatable) {
-        WorldBlock worldBlock;
+    public void removeSimulatableOnWorldMap(Simulatable simulatable) {
         if (simulatable instanceof Rescuable) {
-            worldBlock = (WorldBlock) gridPanel.getComponent(((Rescuable) simulatable).getLocation().getY() * 10 + ((Rescuable) simulatable).getLocation().getX());
+            ((WorldBlock) gridPanel.getComponent(((Rescuable) simulatable).getLocation().getY() * 10 +
+                    ((Rescuable) simulatable).getLocation().getX())).removeSimulatable(simulatable);
+        } else if (simulatable instanceof Unit){
+            ((WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 +
+                    ((Unit) simulatable).getLocation().getX())).removeSimulatable(simulatable);
         } else {
-            worldBlock = (WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 + ((Unit) simulatable).getLocation().getX());
+            ((WorldBlock) gridPanel.getComponent(((Disaster) simulatable).getTarget().getLocation().getY() * 10 +
+                    ((Disaster) simulatable).getTarget().getLocation().getX())).removeSimulatable(simulatable);
         }
-        worldBlock.addSimulatable(simulatable);
     }
 
     public void setCycleInfo(int cycleNumber, int casualties) {

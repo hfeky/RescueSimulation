@@ -18,7 +18,7 @@ public class UnitBlock extends JToggleButton {
             @Override
             public void mouseEntered(MouseEvent e) {
                 UnitBlock.this.setBackground(Color.GREEN);
-                String blockInfo = unit.toString();
+                String blockInfo = "<b>" + unit.getClass().getSimpleName() + ":</b>\n" + unit.toString();
                 if (!blockInfo.isEmpty()) {
                     setToolTipText("<html>" + blockInfo.replaceAll("\n", "<br>") + "</html>");
                 }

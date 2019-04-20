@@ -20,6 +20,8 @@ public class Citizen implements Simulatable, Rescuable {
     private SOSListener emergencyService;
     private WorldListener worldListener;
 
+    private boolean isDead;
+
     public Citizen(Address location, String nationalID, String name, int age, WorldListener worldListener) {
         this.location = location;
         this.nationalID = nationalID;
@@ -66,7 +68,10 @@ public class Citizen implements Simulatable, Rescuable {
 
     public void setHp(int hp) {
         this.hp = Math.min(Math.max(hp, 0), 100);
-        if (this.hp == 0) state = CitizenState.DECEASED;
+        if (this.hp == 0) {
+            isDead = true;
+            state = CitizenState.DECEASED;
+        }
     }
 
     public int getBloodLoss() {
@@ -85,6 +90,10 @@ public class Citizen implements Simulatable, Rescuable {
     public void setToxicity(int toxicity) {
         this.toxicity = Math.min(Math.max(toxicity, 0), 100);
         if (this.toxicity == 100) setHp(0);
+    }
+
+    public boolean isDead() {
+        return isDead;
     }
 
     @Override

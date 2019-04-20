@@ -21,6 +21,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     private Disaster disaster;
 
     private SOSListener emergencyService;
+    private boolean isCollapsed;
 
     public ResidentialBuilding(Address location) {
         this.location = location;
@@ -47,6 +48,7 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
     public void setStructuralIntegrity(int structuralIntegrity) {
         this.structuralIntegrity = Math.max(structuralIntegrity, 0);
         if (this.structuralIntegrity == 0) {
+            isCollapsed = true;
             for (Citizen citizen : occupants) {
                 citizen.setHp(0);
             }
@@ -87,6 +89,10 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
 
     public ArrayList<Citizen> getOccupants() {
         return occupants;
+    }
+
+    public boolean isCollapsed() {
+        return isCollapsed;
     }
 
     @Override
