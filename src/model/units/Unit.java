@@ -174,7 +174,7 @@ public abstract class Unit implements Simulatable, SOSResponder {
                 Math.abs(target.getLocation().getY() - getLocation().getY()));
     }
 
-    private boolean canTreat(Rescuable r) {
+    public boolean canTreat(Rescuable r) {
         if (r instanceof ResidentialBuilding) {
             ResidentialBuilding building = (ResidentialBuilding) r;
             return (this instanceof Evacuator && building.getFoundationDamage() != 0)

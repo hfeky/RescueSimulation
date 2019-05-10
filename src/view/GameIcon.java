@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class GameIcon extends ImageIcon {
 
@@ -31,5 +32,10 @@ public class GameIcon extends ImageIcon {
                 break;
         }
         return new ImageIcon(this.getImage().getScaledInstance(resizedWidth, resizedHeight, Image.SCALE_SMOOTH));
+    }
+
+    public static Icon resizeTo(BufferedImage image, double factor) {
+        return new ImageIcon(image.getScaledInstance((int) (image.getWidth() * factor),
+                (int) (image.getHeight() * factor), Image.SCALE_SMOOTH));
     }
 }

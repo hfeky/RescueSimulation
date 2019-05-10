@@ -26,14 +26,16 @@ public class WorldBlock extends JButton {
     private ArrayList<FireTruck> fireTrucks = new ArrayList<>();
     private ArrayList<GasControlUnit> gasUnits = new ArrayList<>();
 
-    private final int DISASTER_COLOR = 0xFF4FC3F7;
-    private final int DEAD_COLOR = 0xFFB71C1C;
+    private static final Color HOVER_COLOR = new Color(0, 255, 0, 60);
+    private static final Color NORMAL_COLOR = new Color(255, 255, 255, 0);
+    private static final Color DISASTER_COLOR = new Color(248, 160, 0, 60);
+    private static final Color DEAD_COLOR = new Color(183, 28, 28, 60);
 
-    public WorldBlock() {
+    public WorldBlock(final GameView gameView) {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                WorldBlock.this.setBackground(Color.GREEN);
+                WorldBlock.this.setBackground(HOVER_COLOR);
                 StringBuilder blockInfo = new StringBuilder();
                 if (buildings.size() > 0) {
                     blockInfo = addToBlockInfo(blockInfo, buildings);
@@ -53,8 +55,18 @@ public class WorldBlock extends JButton {
             @Override
             public void mouseExited(MouseEvent e) {
                 updateBackgroundColor();
+                gameView.updateGrid();
             }
         });
+        setFocusPainted(false);
+        setBorderPainted(false);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        g.drawImage(new ImageIcon("assets/ico/asphalt.jpg").getImage(), 0, 0,
+                g.getClipBounds().width, g.getClipBounds().height, this);
+        super.paintComponent(g);
     }
 
     @Override
@@ -66,11 +78,13 @@ public class WorldBlock extends JButton {
     private StringBuilder addToBlockInfo(StringBuilder blockInfo, ArrayList<? extends Simulatable> list) {
         if (list.size() == 1) {
             Simulatable simulatable = list.get(0);
-            blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName()).append(":</b>\n").append(simulatable.toString());
+            blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName())
+                    .append(":</b>\n").append(simulatable.toString());
         } else {
             for (int i = 1; i <= list.size(); i++) {
                 Simulatable simulatable = list.get(i - 1);
-                blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName()).append(" ").append(i).append(":</b>\n").append(simulatable.toString());
+                blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName())
+                        .append(" ").append(i).append(":</b>\n").append(simulatable.toString());
             }
         }
         return blockInfo;
@@ -136,7 +150,15 @@ public class WorldBlock extends JButton {
         requestLayout();
     }
 
-    public Rescuable getMainRescuable() {
+    public Rescuable getMainRescuable(Unit unit) {
+        if (unit != null) {
+            for (ResidentialBuilding building : buildings) {
+                if (unit.canTreat(building)) return building;
+            }
+            for (Citizen citizen : citizens) {
+                if (unit.canTreat(citizen)) return citizen;
+            }
+        }
         return buildings.size() > 0 ? buildings.get(0) : citizens.size() > 0 ? citizens.get(0) : null;
     }
 
@@ -205,20 +227,22 @@ public class WorldBlock extends JButton {
             } else if (pairs.size() == 1) {
                 graphics.drawImage(getIcon(pairs.get(0).getKey()), 5, 0, 80, 80, this);
             }
-            setIcon(new ImageIcon(bufferedImage));
+            double factor = (double) (Math.min(getWidth(), getHeight())) /
+                    (double) (Math.min(bufferedImage.getWidth(), bufferedImage.getHeight()));
+            setIcon(GameIcon.resizeTo(bufferedImage, factor * 0.8));
         }
     }
 
     private void updateBackgroundColor() {
-        Rescuable rescuable = getMainRescuable();
+        Rescuable rescuable = getMainRescuable(null);
         if (rescuable != null &&
                 ((rescuable instanceof ResidentialBuilding && ((ResidentialBuilding) rescuable).isCollapsed())
                         || (rescuable instanceof Citizen && ((Citizen) rescuable).isDead()))) {
-            setBackground(new Color(DEAD_COLOR));
+            setBackground(DEAD_COLOR);
         } else if (rescuable != null && rescuable.getDisaster() != null && rescuable.getDisaster().isActive()) {
-            setBackground(new Color(DISASTER_COLOR));
+            setBackground(DISASTER_COLOR);
         } else {
-            setBackground(UIManager.getColor("control"));
+            setBackground(NORMAL_COLOR);
         }
     }
 

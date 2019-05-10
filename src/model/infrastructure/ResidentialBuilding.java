@@ -91,6 +91,14 @@ public class ResidentialBuilding implements Simulatable, Rescuable {
         return occupants;
     }
 
+    public int countAliveOccupants() {
+        int alive = 0;
+        for (Citizen citizen : getOccupants()) {
+            if (!citizen.isDead()) alive += 1;
+        }
+        return alive;
+    }
+
     public boolean isCollapsed() {
         return isCollapsed;
     }

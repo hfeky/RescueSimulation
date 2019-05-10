@@ -12,11 +12,15 @@ import view.GameView;
 import view.UnitBlock;
 import view.WorldBlock;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 import java.util.ArrayList;
 
 public class CommandCenter implements SOSListener {
@@ -63,6 +67,7 @@ public class CommandCenter implements SOSListener {
                 if (!engine.checkGameOver()) {
                     try {
                         engine.nextCycle();
+                        gameView.recommendMoves(visibleBuildings, visibleCitizens, emergencyUnits);
                     } catch (DisasterException de) {
                         de.printStackTrace();
                     }
@@ -78,7 +83,7 @@ public class CommandCenter implements SOSListener {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (selectedUnit != null) {
-                        Rescuable rescuable = worldBlock.getMainRescuable();
+                        Rescuable rescuable = worldBlock.getMainRescuable(selectedUnit.getUnit());
                         if (rescuable != null) {
                             try {
                                 selectedUnit.getUnit().respond(rescuable);
@@ -95,17 +100,22 @@ public class CommandCenter implements SOSListener {
         }
 
         initWorldMap();
+
+        AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("assets/sfx/metropolis.wav"));
+        Clip clip = AudioSystem.getClip();
+        clip.open(audioInputStream);
+        clip.loop(Clip.LOOP_CONTINUOUSLY);
+        clip.start();
     }
 
     @Override
     public void receiveSOSCall(Rescuable r) {
         if (r instanceof Citizen) {
-            visibleCitizens.add((Citizen) r);
+            if (!visibleCitizens.contains(r)) visibleCitizens.add((Citizen) r);
         } else if (r instanceof ResidentialBuilding) {
-            visibleBuildings.add((ResidentialBuilding) r);
+            if (!visibleBuildings.contains(r)) visibleBuildings.add((ResidentialBuilding) r);
         }
         gameView.addSimulatableOnWorldMap(r.getDisaster());
-        //gameView.addSimulatableOnWorldMap((Simulatable) r);
     }
 
     private void initWorldMap() {
