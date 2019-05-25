@@ -115,7 +115,6 @@ public class CommandCenter implements SOSListener {
         } else if (r instanceof ResidentialBuilding) {
             if (!visibleBuildings.contains(r)) visibleBuildings.add((ResidentialBuilding) r);
         }
-        gameView.addSimulatableOnWorldMap(r.getDisaster());
     }
 
     private void initWorldMap() {

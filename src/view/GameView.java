@@ -146,9 +146,6 @@ public class GameView extends JFrame {
         } else if (simulatable instanceof Unit) {
             ((WorldBlock) gridPanel.getComponent(((Unit) simulatable).getLocation().getY() * 10 +
                     ((Unit) simulatable).getLocation().getX())).addSimulatable(simulatable);
-        } else {
-            ((WorldBlock) gridPanel.getComponent(((Disaster) simulatable).getTarget().getLocation().getY() * 10 +
-                    ((Disaster) simulatable).getTarget().getLocation().getX())).addSimulatable(simulatable);
         }
     }
 

@@ -1,7 +1,6 @@
 package view;
 
 import javafx.util.Pair;
-import model.disasters.Disaster;
 import model.infrastructure.ResidentialBuilding;
 import model.people.Citizen;
 import model.units.*;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 
 public class WorldBlock extends JButton {
 
-    private Disaster disaster;
     private ArrayList<ResidentialBuilding> buildings = new ArrayList<>();
     private ArrayList<Citizen> citizens = new ArrayList<>();
     private ArrayList<Ambulance> ambulances = new ArrayList<>();
@@ -38,15 +36,15 @@ public class WorldBlock extends JButton {
                 WorldBlock.this.setBackground(HOVER_COLOR);
                 StringBuilder blockInfo = new StringBuilder();
                 if (buildings.size() > 0) {
-                    blockInfo = addToBlockInfo(blockInfo, buildings);
+                    addToBlockInfo(blockInfo, buildings);
                 } else if (citizens.size() > 0) {
-                    blockInfo = addToBlockInfo(blockInfo, citizens);
+                    addToBlockInfo(blockInfo, citizens);
                 }
-                blockInfo = addToBlockInfo(blockInfo, ambulances);
-                blockInfo = addToBlockInfo(blockInfo, diseaseUnits);
-                blockInfo = addToBlockInfo(blockInfo, evacuators);
-                blockInfo = addToBlockInfo(blockInfo, fireTrucks);
-                blockInfo = addToBlockInfo(blockInfo, gasUnits);
+                addToBlockInfo(blockInfo, ambulances);
+                addToBlockInfo(blockInfo, diseaseUnits);
+                addToBlockInfo(blockInfo, evacuators);
+                addToBlockInfo(blockInfo, fireTrucks);
+                addToBlockInfo(blockInfo, gasUnits);
                 if (blockInfo.length() > 0) {
                     setToolTipText("<html>" + blockInfo.toString().trim().replaceAll("\n", "<br>") + "</html>");
                 }
@@ -75,7 +73,7 @@ public class WorldBlock extends JButton {
         requestLayout();
     }
 
-    private StringBuilder addToBlockInfo(StringBuilder blockInfo, ArrayList<? extends Simulatable> list) {
+    private void addToBlockInfo(StringBuilder blockInfo, ArrayList<? extends Simulatable> list) {
         if (list.size() == 1) {
             Simulatable simulatable = list.get(0);
             blockInfo.append("\n\n<b>").append(simulatable.getClass().getSimpleName())
@@ -87,11 +85,6 @@ public class WorldBlock extends JButton {
                         .append(" ").append(i).append(":</b>\n").append(simulatable.toString());
             }
         }
-        return blockInfo;
-    }
-
-    public void setDisaster(Disaster disaster) {
-        this.disaster = disaster;
     }
 
     public void addSimulatable(Simulatable simulatable) {
@@ -123,8 +116,6 @@ public class WorldBlock extends JButton {
             if (!gasUnits.contains(simulatable)) {
                 gasUnits.add((GasControlUnit) simulatable);
             }
-        } else if (simulatable instanceof Disaster) {
-            this.disaster = (Disaster) simulatable;
         }
         requestLayout();
     }
@@ -144,8 +135,6 @@ public class WorldBlock extends JButton {
             fireTrucks.remove(simulatable);
         } else if (simulatable instanceof GasControlUnit) {
             gasUnits.remove(simulatable);
-        } else if (simulatable instanceof Disaster) {
-            this.disaster = null;
         }
         requestLayout();
     }
