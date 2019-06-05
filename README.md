@@ -4,7 +4,7 @@ The Rescue Simulation is based on concepts of the RoboCup, an annual internation
 
 This is a very simple game that demonstrates it using Java and OOP concepts.
 
-## Note:
+## Note
 
 The game definitely has a vast room for improvement, but since this was a project for a mandatory course in college, we were *strictly* required to follow the game description as exactly mentioned in the [description](https://github.com/HusseinElFeky/RescueSimulation/tree/master/description) folder, and we were not allowed to modify the game implementation/mechanism or change any existing features or even add new ones.
 
@@ -18,7 +18,7 @@ This document just provides a detailed description of the game elements and game
 
 This milestone is the first exercise on the concepts of Object Oriented Programming (OOP).
 
-**Deliverables:**
+Deliverables:
 
 - A packaging hierarchy for the code
 - An initial implementation for all the needed data structures
@@ -28,7 +28,7 @@ This milestone is the first exercise on the concepts of Object Oriented Programm
 
 This milestone is a further exercise on the concepts of Object Oriented Programming (OOP).
 
-**Deliverables:**
+Deliverables:
 
 - A working game engine with all of its logic that can be played on the console if needed.
 
@@ -36,7 +36,7 @@ This milestone is a further exercise on the concepts of Object Oriented Programm
 
 This milestone is the last exercise on the concepts of Object Oriented Programming (OOP).
 
-**Deliverables:**
+Deliverables:
 
 - Adding and handling all exceptions that could arise during the gameplay
 - Implementing a Graphical User Interface (GUI) for the game
@@ -45,7 +45,7 @@ This milestone is the last exercise on the concepts of Object Oriented Programmi
 
 This document introduces the possible bonus features that one could add to the game. One could only choose one feature to get the bonus. We chose bonus feature #3 (Computer-Assisted Gameplay). One needed to design a simple computer companion to help the player decide what to do next. A recommendation system was implemented to take into consideration the current status of all game objects, then recommends the best moves possible.
 
-## Contribution:
+## Contribution
 
 The project team consisted of 3 members:
 
